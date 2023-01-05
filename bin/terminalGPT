@@ -7,7 +7,7 @@ const chalk = require("chalk");
 const gradient = require("gradient-string");
 
 const configuration = new Configuration({
-  apiKey: "YOUR_API_KEY",
+  apiKey: "YOU_API_KEY",
 });
 const openai = new OpenAIApi(configuration);
 
@@ -47,7 +47,7 @@ commander
       const response = await prompts({
         type: "text",
         name: "value",
-        message: "You: ",
+        message: `${chalk.blueBright("You: ")}`,
         validate: (value) => {
           return true;
         },
@@ -67,7 +67,7 @@ commander
         // map all choices to text
         const getText = request.data.choices.map((choice) => choice.text);
 
-        console.log(`GPT-3: ${getText}`);
+        console.log(`${chalk.cyan("GPT-3: ")}${getText} \n`);
         prompt();
       }
     };

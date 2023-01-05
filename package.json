@@ -1,0 +1,27 @@
+{
+  "name": "terminalgpt",
+  "version": "1.0.0",
+  "description": "Get GPT like chatGPT on your terminal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jucasoliveira/terminalGPT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jucasoliveira/terminalGPT/issues"
+  },
+  "homepage": "https://github.com/jucasoliveira/terminalGPT#readme",
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "commander": "^9.4.1",
+    "lowdb": "^5.0.5",
+    "openai": "^3.1.0",
+    "prompts": "^2.4.2"
+  }
+}

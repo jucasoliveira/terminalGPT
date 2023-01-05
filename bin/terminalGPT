@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+
+const { Configuration, OpenAIApi } = require("openai");
+const commander = require("commander");
+const prompts = require("prompts");
+
+const configuration = new Configuration({
+  apiKey: "YOUR_API_KEY",
+});
+const openai = new OpenAIApi(configuration);
+
+const intro = function () {
+  const usageText = `
+  Welcome to terminalGPT
+
+  usage:
+    Terminal will prompt you to enter a message. Type your message and press enter.
+    Terminal will then prompt you to enter a response. Type your response and press enter.
+
+    To exit, type "exit" and press enter.
+
+
+  `;
+
+  console.log(usageText);
+};
+
+commander
+  .command("chat")
+  .option("-e, --engine <engine>", "GPT-3 model to use")
+  .option("-t, --temperature <temperature>", "Response temperature")
+  .usage(`"<project-directory>" [options]`)
+  .action((options) => {
+    intro();
+    const prompt = async () => {
+      const response = await prompts({
+        type: "text",
+        name: "value",
+        message: "You: ",
+        validate: (value) => {
+          return true;
+        },
+      });
+
+      if (response.value !== "exit") {
+        const request = await openai.createCompletion({
+          model: options.engine || "text-davinci-002",
+          prompt: response.value,
+          max_tokens: 2048,
+          temperature: parseInt(options.temperature) || 0.5,
+        });
+        if (!request.data.choices?.[0].text) {
+          return res.status(500).json({ message: "Something went wrong" });
+        }
+
+        // map all choices to text
+        const getText = request.data.choices.map((choice) => choice.text);
+
+        console.log(`GPT-3: ${getText}`);
+        prompt();
+      }
+    };
+
+    prompt();
+  });
+
+commander.parse(process.argv);

@@ -1,8 +1,8 @@
 {
   "name": "terminalgpt",
   "version": "1.0.0",
+  "main": "./bin/terminalGPT.js",
   "description": "Get GPT like chatGPT on your terminal",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,6 +16,7 @@
   "bugs": {
     "url": "https://github.com/jucasoliveira/terminalGPT/issues"
   },
+  "bin": "./bin/terminalGPT.js",
   "homepage": "https://github.com/jucasoliveira/terminalGPT#readme",
   "dependencies": {
     "chalk": "^4.1.2",

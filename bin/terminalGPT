@@ -21,7 +21,7 @@ const apiKeyPrompt = async () => {
   let apiKey = getApiKey();
   if (!apiKey) {
     const response = await prompts({
-      type: "text",
+      type: "password",
       name: "apiKey",
       message: "Enter your OpenAI API key:",
       validate: (value) => {

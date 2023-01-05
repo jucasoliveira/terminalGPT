@@ -3,6 +3,8 @@
 const { Configuration, OpenAIApi } = require("openai");
 const commander = require("commander");
 const prompts = require("prompts");
+const chalk = require("chalk");
+const gradient = require("gradient-string");
 
 const configuration = new Configuration({
   apiKey: "YOUR_API_KEY",
@@ -11,13 +13,22 @@ const openai = new OpenAIApi(configuration);
 
 const intro = function () {
   const usageText = `
-  Welcome to terminalGPT
+  ${gradient(
+    "cyan",
+    "pink"
+  )("****************")} Welcome to ${chalk.greenBright(
+    "terminalGPT"
+  )} ${gradient("cyan", "pink")("****************")}
 
-  usage:
+  ${gradient("orange", "yellow").multiline(
+    ["  __", "<(o )___", " ( ._> /", "  `---'"].join("\n")
+  )} 
+  
+  ${chalk.yellowBright("usage:")}
     Terminal will prompt you to enter a message. Type your message and press enter.
     Terminal will then prompt you to enter a response. Type your response and press enter.
 
-    To exit, type "exit" and press enter.
+    To exit, type "${chalk.redBright("exit")}" and press enter.
 
 
   `;

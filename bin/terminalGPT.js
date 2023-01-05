@@ -98,8 +98,19 @@ commander
           // map all choices to text
           const getText = request.data.choices.map((choice) => choice.text);
 
-          console.log(`${chalk.cyan("GPT-3: ")}${getText} \n`);
-          prompt();
+          console.log(`${chalk.cyan("GPT-3: ")}`);
+          // console log each character of the text with a delay and then call prompt when it finished
+          let i = 0;
+          const interval = setInterval(() => {
+            if (i < getText[0].length) {
+              process.stdout.write(getText[0][i]);
+              i++;
+            } else {
+              clearInterval(interval);
+              console.log("\n");
+              prompt();
+            }
+          }, 10);
         }
       };
 

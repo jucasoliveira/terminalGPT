@@ -35,12 +35,15 @@ const decrypt = (text) => {
 };
 
 const saveApiKey = (apiKey) => {
-  fs.writeFileSync("./apiKey.txt", apiKey);
+  fs.writeFileSync(`${__dirname}/apiKey.txt`, apiKey);
 };
 
 const getApiKey = () => {
-  if (fs.existsSync("./apiKey.txt")) {
-    const getEncryptedScript = fs.readFileSync("./apiKey.txt", "utf8");
+  if (fs.existsSync(`${__dirname}/apiKey.txt`)) {
+    const getEncryptedScript = fs.readFileSync(
+      `${__dirname}/apiKey.txt`,
+      "utf8"
+    );
     const decryptedScript = decrypt(getEncryptedScript);
     return decryptedScript;
   }
@@ -92,7 +95,13 @@ const intro = function () {
   console.log(usageText);
 };
 
-const generateResponse = async (apiKey, prompt, options, response) => {
+const generateResponse = async (
+  apiKey,
+  prompt,
+  options,
+  response,
+  context = ""
+) => {
   const configuration = new Configuration({
     apiKey,
   });
@@ -101,7 +110,7 @@ const generateResponse = async (apiKey, prompt, options, response) => {
   const request = await openai
     .createCompletion({
       model: options.engine || "text-davinci-002",
-      prompt: response.value,
+      prompt: `${context}\n${response.value}`,
       max_tokens: 2048,
       temperature: parseInt(options.temperature) || 0.5,
     })
@@ -110,10 +119,10 @@ const generateResponse = async (apiKey, prompt, options, response) => {
       return response;
     })
     .catch((err) => {
-      console.error(`${chalk.red("Something went wront")} ${err}`);
+      console.error(`${chalk.red("Something went wrong")} ${err}`);
     });
   if (!request.data?.choices?.[0].text) {
-    return console.error(`${chalk.red("Something went wront")}`);
+    return console.error(`${chalk.red("Something went wrong")}`);
   }
 
   // map all choices to text

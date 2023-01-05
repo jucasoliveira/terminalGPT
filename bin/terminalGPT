@@ -5,11 +5,36 @@ const commander = require("commander");
 const prompts = require("prompts");
 const chalk = require("chalk");
 const gradient = require("gradient-string");
+const fs = require("fs");
 
-const configuration = new Configuration({
-  apiKey: "YOU_API_KEY",
-});
-const openai = new OpenAIApi(configuration);
+const saveApiKey = (apiKey) => {
+  fs.writeFileSync("./apiKey.txt", apiKey);
+};
+
+const getApiKey = () => {
+  if (fs.existsSync("./apiKey.txt")) {
+    return fs.readFileSync("./apiKey.txt", "utf8");
+  }
+};
+
+const apiKeyPrompt = async () => {
+  let apiKey = getApiKey();
+  if (!apiKey) {
+    const response = await prompts({
+      type: "text",
+      name: "apiKey",
+      message: "Enter your OpenAI API key:",
+      validate: (value) => {
+        return value !== "";
+      },
+    });
+
+    apiKey = response.apiKey;
+    saveApiKey(apiKey);
+  }
+
+  return apiKey;
+};
 
 const intro = function () {
   const usageText = `
@@ -43,36 +68,43 @@ commander
   .usage(`"<project-directory>" [options]`)
   .action((options) => {
     intro();
-    const prompt = async () => {
-      const response = await prompts({
-        type: "text",
-        name: "value",
-        message: `${chalk.blueBright("You: ")}`,
-        validate: (value) => {
-          return true;
-        },
+    apiKeyPrompt().then((apiKey) => {
+      const configuration = new Configuration({
+        apiKey,
       });
+      const openai = new OpenAIApi(configuration);
 
-      if (response.value !== "exit") {
-        const request = await openai.createCompletion({
-          model: options.engine || "text-davinci-002",
-          prompt: response.value,
-          max_tokens: 2048,
-          temperature: parseInt(options.temperature) || 0.5,
+      const prompt = async () => {
+        const response = await prompts({
+          type: "text",
+          name: "value",
+          message: `${chalk.blueBright("You: ")}`,
+          validate: (value) => {
+            return true;
+          },
         });
-        if (!request.data.choices?.[0].text) {
-          return res.status(500).json({ message: "Something went wrong" });
+
+        if (response.value !== "exit") {
+          const request = await openai.createCompletion({
+            model: options.engine || "text-davinci-002",
+            prompt: response.value,
+            max_tokens: 2048,
+            temperature: parseInt(options.temperature) || 0.5,
+          });
+          if (!request.data.choices?.[0].text) {
+            return res.status(500).json({ message: "Something went wrong" });
+          }
+
+          // map all choices to text
+          const getText = request.data.choices.map((choice) => choice.text);
+
+          console.log(`${chalk.cyan("GPT-3: ")}${getText} \n`);
+          prompt();
         }
+      };
 
-        // map all choices to text
-        const getText = request.data.choices.map((choice) => choice.text);
-
-        console.log(`${chalk.cyan("GPT-3: ")}${getText} \n`);
-        prompt();
-      }
-    };
-
-    prompt();
+      prompt();
+    });
   });
 
 commander.parse(process.argv);

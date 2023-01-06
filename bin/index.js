@@ -176,10 +176,6 @@ commander
             return process.exit(0);
           case "clear":
             return process.stdout.write("\x1Bc");
-          case "error":
-            process.stdout.write("\x1Bc");
-            generateResponse(apiKey, prompt, options, response);
-            return;
           default:
             generateResponse(apiKey, prompt, options, response);
             return;

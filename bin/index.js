@@ -119,10 +119,20 @@ const generateResponse = async (
       return response;
     })
     .catch((err) => {
-      console.error(`${chalk.red("Something went wrong")} ${err}`);
+      if(err["response"]["status"] == "429") {
+        console.error(`${chalk.red("\nChat GPT is having too many requests, wait and send it again.")}`);
+      } else {    
+        console.error(`${chalk.red("Something went wrong!!")} ${err}`);
+      }
+
+      spinner.stop();
+      return "error";
     });
-  if (!request.data?.choices?.[0].text) {
-    return console.error(`${chalk.red("Something went wrong")}`);
+
+  
+  if (request == undefined || !request.data?.choices?.[0].text) {
+    console.error(`${chalk.red("Something went wrong!")}`);
+    return "error";
   }
 
   // map all choices to text
@@ -166,6 +176,10 @@ commander
             return process.exit(0);
           case "clear":
             return process.stdout.write("\x1Bc");
+          case "error":
+            process.stdout.write("\x1Bc");
+            generateResponse(apiKey, prompt, options, response);
+            return;
           default:
             generateResponse(apiKey, prompt, options, response);
             return;

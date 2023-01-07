@@ -61,8 +61,8 @@ const apiKeyPrompt = async () => {
       },
     });
 
-    apiKey = encrypt(response.apiKey);
-    saveApiKey(apiKey);
+    apiKey = response.apiKey;
+    saveApiKey(encrypt(apiKey));
   }
 
   return apiKey;

@@ -44,9 +44,9 @@ const generateResponse = async (
       max_tokens: 2048,
       temperature: parseInt(options.temperature) || 0.5,
     })
-    .then((response) => {
+    .then((res) => {
       spinner.stop();
-      return response;
+      return res;
     })
     .catch((err) => {
       if (err["response"]["status"] == "429") {

@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bump version
+        run: |
+          # Bump package.json version
+          npm version patch
+
+          # Get the new version number
+          NEW_VERSION=$(node -p "require('./package.json').version")
+
+          # Create a new release tag
+          git tag "${NEW_VERSION}"
+          git push --tags
+      - name: NPM Publish
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}

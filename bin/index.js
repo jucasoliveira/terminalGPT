@@ -5,49 +5,10 @@ const commander = require("commander");
 const prompts = require("prompts");
 const chalk = require("chalk");
 const gradient = require("gradient-string");
-const fs = require("fs");
 const process = require("process");
 const ora = require("ora");
-const crypto = require("crypto");
 
-const algorithm = "aes-256-cbc";
-const secretKey = "terminalGPT";
-
-const encrypt = (text) => {
-  const iv = crypto.randomBytes(16);
-  const key = crypto.scryptSync(secretKey, "salt", 32);
-  const cipher = crypto.createCipheriv(algorithm, key, iv);
-  let encrypted = cipher.update(text);
-
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return iv.toString("hex") + ":" + encrypted.toString("hex");
-};
-
-const decrypt = (text) => {
-  const textParts = text.split(":");
-  const iv = Buffer.from(textParts.shift(), "hex");
-  const encryptedText = Buffer.from(textParts.join(":"), "hex");
-  const key = crypto.scryptSync(secretKey, "salt", 32);
-  const decipher = crypto.createDecipheriv(algorithm, key, iv);
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-};
-
-const saveApiKey = (apiKey) => {
-  fs.writeFileSync(`${__dirname}/apiKey.txt`, apiKey);
-};
-
-const getApiKey = () => {
-  if (fs.existsSync(`${__dirname}/apiKey.txt`)) {
-    const getEncryptedScript = fs.readFileSync(
-      `${__dirname}/apiKey.txt`,
-      "utf8"
-    );
-    const decryptedScript = decrypt(getEncryptedScript);
-    return decryptedScript;
-  }
-};
+const { encrypt, saveApiKey, getApiKey } = require("./encrypt");
 
 const apiKeyPrompt = async () => {
   let apiKey = getApiKey();
@@ -119,8 +80,12 @@ const generateResponse = async (
       return response;
     })
     .catch((err) => {
-      if(err["response"]["status"] == "429") {
-        console.error(`${chalk.red("\nChat GPT is having too many requests, wait and send it again.")}`);
+      if (err["response"]["status"] == "429") {
+        console.error(
+          `${chalk.red(
+            "\nChat GPT is having too many requests, wait and send it again."
+          )}`
+        );
       } else {
         console.error(`${chalk.red("Something went wrong!!")} ${err}`);
       }
@@ -128,7 +93,6 @@ const generateResponse = async (
       spinner.stop();
       return "error";
     });
-
 
   if (request == undefined || !request.data?.choices?.[0].text) {
     console.error(`${chalk.red("Something went wrong!")}`);

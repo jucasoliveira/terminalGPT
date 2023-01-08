@@ -7,6 +7,7 @@ const ora = require("ora");
 
 const apiKeyPrompt = async () => {
   let apiKey = getApiKey();
+
   if (!apiKey) {
     const response = await prompts({
       type: "password",

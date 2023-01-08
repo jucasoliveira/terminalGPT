@@ -1,9 +1,9 @@
 name: Pull Request Test
 
 on:
-  push:
+  pull_request:
     branches:
-      - create_unit_test
+      - main
 
 jobs: build
   runs-on: ubuntu-latest

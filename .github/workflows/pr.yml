@@ -5,22 +5,22 @@ on:
     branches:
       - create_unit_test
 
-jobs: build
+jobs:
   test_coverage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: "12.x"
       - run: npm install
       - run: npm test -- --coverage
       - uses: ArtiomTr/jest-coverage-report-action@v2
         id: coverage
         with:
-            test-script: npm test
-            coverage-file: ./coverage/coverage-final.json
-            output: report-markdown
+          test-script: npm test
+          coverage-file: ./coverage/coverage-final.json
+          output: report-markdown
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
-            message: ${{ steps.coverage.outputs.report }}
+          message: ${{ steps.coverage.outputs.report }}

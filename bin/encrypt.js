@@ -27,16 +27,15 @@ const decrypt = (text) => {
 };
 
 const saveApiKey = (apiKey) => {
-  const scriptPath = process.argv[1];
-  const apiKeyPath = path.resolve(path.dirname(scriptPath), "apiKey.txt");
-  fs.writeFileSync(apiKeyPath, apiKey);
+  fs.writeFileSync(`${__dirname}/apiKey.txt`, apiKey);
 };
 
 const getApiKey = () => {
-  const scriptPath = process.argv[1];
-  const apiKeyPath = path.resolve(path.dirname(scriptPath), "apiKey.txt");
-  if (fs.existsSync(apiKeyPath)) {
-    const getEncryptedScript = fs.readFileSync(apiKeyPath, "utf8");
+  if (fs.existsSync(`${__dirname}/apiKey.txt`)) {
+    const getEncryptedScript = fs.readFileSync(
+      `${__dirname}/apiKey.txt`,
+      "utf8"
+    );
     const decryptedScript = decrypt(getEncryptedScript);
     return decryptedScript;
   }

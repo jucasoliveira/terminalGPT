@@ -29,8 +29,7 @@ describe("decrypt()", () => {
 });
 
 describe("saveApiKey()", () => {
-  const scriptPath = process.argv[1];
-  const apiKeyPath = path.resolve(path.dirname(scriptPath), "apiKey.txt");
+  const apiKeyPath = path.resolve(__dirname, "../bin/apiKey.txt");
 
   beforeEach(() => {
     if (!fs.existsSync(apiKeyPath)) {
@@ -49,8 +48,8 @@ describe("saveApiKey()", () => {
 });
 
 describe("getApiKey()", () => {
-  const scriptPath = process.argv[1];
-  const apiKeyPath = path.resolve(path.dirname(scriptPath), "apiKey.txt");
+  // the path to the apiKey.txt file should point to ../bin/apiKey.txt
+  const apiKeyPath = path.resolve(__dirname, "../bin/apiKey.txt");
   const encryptedText = crypto.encrypt("test");
 
   it("should return the API key if it has been saved", () => {

@@ -61,8 +61,8 @@ const apiKeyPrompt = async () => {
       },
     });
 
-    apiKey = encrypt(response.apiKey);
-    saveApiKey(apiKey);
+    apiKey = response.apiKey;
+    saveApiKey(encrypt(apiKey));
   }
 
   return apiKey;
@@ -79,11 +79,11 @@ const intro = function () {
 
   ${gradient("orange", "yellow").multiline(
     ["  __", "<(o )___", " ( ._> /", "  `---'"].join("\n")
-  )} 
-  
+  )}
+
   ${chalk.yellowBright("usage:")}
     TerminalGPT will ask you to add your OpenAI API key. Don't worry, it's saves on your machine locally.
-    
+
     Terminal will prompt you to enter a message. Type your message and press enter.
     Terminal will then prompt you to enter a response. Type your response and press enter.
 
@@ -121,7 +121,7 @@ const generateResponse = async (
     .catch((err) => {
       if(err["response"]["status"] == "429") {
         console.error(`${chalk.red("\nChat GPT is having too many requests, wait and send it again.")}`);
-      } else {    
+      } else {
         console.error(`${chalk.red("Something went wrong!!")} ${err}`);
       }
 
@@ -129,7 +129,7 @@ const generateResponse = async (
       return "error";
     });
 
-  
+
   if (request == undefined || !request.data?.choices?.[0].text) {
     console.error(`${chalk.red("Something went wrong!")}`);
     return "error";

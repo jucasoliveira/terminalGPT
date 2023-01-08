@@ -1,0 +1,20 @@
+name: Pull Request Test
+
+on:
+  push:
+    branches:
+      - create_unit_test
+
+jobs: build
+  runs-on: ubuntu-latest
+  steps:
+      - uses: actions/checkout@v3
+      - uses: ArtiomTr/jest-coverage-report-action@v2
+        id: coverage
+        with:
+            test-script: npm test
+            coverage-file: ./coverage/coverage-final.json
+            output: report-markdown
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+            message: ${{ steps.coverage.outputs.report }}

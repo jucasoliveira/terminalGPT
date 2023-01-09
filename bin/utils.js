@@ -42,13 +42,12 @@ const generateResponse = async (apiKey, prompt, options, response) => {
     });
 
     let sessionContext = getContext();
-    console.log(sessionContext, "****");
     const openai = new OpenAIApi(configuration);
     const spinner = ora("Thinking...").start();
     const request = await openai
       .createCompletion({
         model: options.engine || "text-davinci-002",
-        prompt: `${response.value}`,
+        prompt: `${sessionContext}${response.value}`,
         max_tokens: 2048,
         temperature: parseInt(options.temperature) || 0.5,
       })

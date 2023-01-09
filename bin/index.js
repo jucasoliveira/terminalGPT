@@ -7,6 +7,7 @@ const process = require("process");
 
 const { intro } = require("./intro");
 const { apiKeyPrompt, generateResponse } = require("./utils");
+const { deleteApiKey } = require("./encrypt");
 
 commander
   .command("chat")
@@ -39,6 +40,36 @@ commander
 
       prompt();
     });
+  });
+
+// create commander to delete api key
+
+commander
+  .command("delete")
+  .description("Delete your API key")
+  .action(async () => {
+    const response = await prompts({
+      type: "select",
+      name: "value",
+      message: "Are you sure?",
+      choices: [
+        { title: "Yes", value: "yes" },
+        { title: "No - exit", value: "no" },
+      ],
+      initial: 0,
+    });
+
+    switch (response.value) {
+      case "no":
+        return process.exit(0);
+      case "yes":
+      default:
+        // call the function again
+        deleteApiKey();
+        break;
+    }
+    deleteApiKey();
+    console.log("API key deleted");
   });
 
 commander.parse(process.argv);

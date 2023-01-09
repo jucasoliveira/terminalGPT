@@ -5,7 +5,8 @@
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {
     "test": "jest --ci --coverage --verbose",
-    "dev": "node bin/index.js chat --engine text-davinci-002 --temperature 0.7"
+    "chat": "node bin/index.js chat --engine text-davinci-002 --temperature 0.7",
+    "delete": "node bin/index.js delete"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,5 @@
 const { Configuration, OpenAIApi } = require("openai");
-const { encrypt, saveApiKey, getApiKey, deleteApiKey } = require("./encrypt");
+const { encrypt, saveApiKey, getApiKey } = require("./encrypt");
 const prompts = require("prompts");
 const chalk = require("chalk");
 const process = require("process");

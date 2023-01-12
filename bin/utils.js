@@ -1,9 +1,8 @@
-const { Configuration, OpenAIApi } = require("openai");
 const { encrypt, saveApiKey, getApiKey } = require("./encrypt");
 const prompts = require("prompts");
 const chalk = require("chalk");
 const process = require("process");
-const ora = require("ora");
+const { generateCompletion } = require("./gpt");
 
 const apiKeyPrompt = async () => {
   let apiKey = getApiKey();
@@ -25,50 +24,14 @@ const apiKeyPrompt = async () => {
   return apiKey;
 };
 
-let context = "";
-
-const addContext = (text) => {
-  context = `${context}\n${text}`;
-};
-
-const getContext = () => {
-  return context;
-};
-
 const generateResponse = async (apiKey, prompt, options, response) => {
   try {
-    const configuration = new Configuration({
+    const request = await generateCompletion(
       apiKey,
-    });
-
-    let sessionContext = getContext();
-    const openai = new OpenAIApi(configuration);
-    const spinner = ora("Thinking...").start();
-    const request = await openai
-      .createCompletion({
-        model: options.engine || "text-davinci-002",
-        prompt: `${sessionContext}${response.value}`,
-        max_tokens: 2048,
-        temperature: parseInt(options.temperature) || 0.5,
-      })
-      .then((res) => {
-        spinner.stop();
-        return res;
-      })
-      .catch((err) => {
-        if (err["response"]["status"] == "429") {
-          console.error(
-            `${chalk.red(
-              "\nChat GPT is having too many requests, wait and send it again."
-            )}`
-          );
-        } else {
-          console.error(`${chalk.red("Something went wrong!!")} ${err}`);
-        }
-
-        spinner.stop();
-        return "error";
-      });
+      options.engine || "text-davinci-002",
+      response.value,
+      options
+    );
 
     if (request == undefined || !request.data?.choices?.[0].text) {
       throw new Error("Something went wrong!");
@@ -77,7 +40,6 @@ const generateResponse = async (apiKey, prompt, options, response) => {
     // map all choices to text
     const getText = request.data.choices.map((choice) => choice.text);
 
-    addContext(getText[0]);
     console.log(`${chalk.cyan("GPT-3: ")}`);
     // console log each character of the text with a delay and then call prompt when it finished
     let i = 0;

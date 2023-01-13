@@ -2,6 +2,9 @@ const gradient = require("gradient-string");
 const chalk = require("chalk");
 
 const intro = () => {
+  const duck = ` ${gradient("orange", "yellow").multiline(
+    ["  __", "<(o )___", " ( ._> /", "  `---'"].join("\n")
+  )}`;
   const usageText = `
   ${gradient(
     "cyan",
@@ -10,9 +13,7 @@ const intro = () => {
     "terminalGPT"
   )} ${gradient("cyan", "pink")("****************")}
 
-  ${gradient("orange", "yellow").multiline(
-    ["  __", "<(o )___", " ( ._> /", "  `---'"].join("\n")
-  )}
+  ${duck}
 
   ${chalk.yellowBright("usage:")}
     TerminalGPT will ask you to add your OpenAI API key. Don't worry, it's saves on your machine locally.
@@ -25,7 +26,7 @@ const intro = () => {
 
   `;
 
-  console.log(usageText);
+  console.log(usageText.padEnd(10, " "));
 };
 
 module.exports = {

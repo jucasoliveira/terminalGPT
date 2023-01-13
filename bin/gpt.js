@@ -7,25 +7,54 @@ const appendToFile = (file, message, response) => {
   // find file, if not , create it
   // append to file with the structure {"prompt": messge, "completion": response}
 
-  // check if file exists
-  if (fs.existsSync(file)) {
-    // read file
-    const data = fs.readFileSync(file, "utf8");
-    // parse data
-    const parsedData = JSON.parse(data);
-    // append to data
-    parsedData.push({ prompt: message, completion: response });
-    // write to file
-    fs.writeFileSync(file, JSON.stringify(parsedData));
+  if (!fs.existsSync(file)) {
+    fs.createWriteStream(file).on("open", function (fd) {
+      fs.appendFileSync(
+        fd,
+        JSON.stringify({ prompt: message, completion: response }) + "\n"
+      );
+    });
   } else {
-    // create file
-    fs.writeFileSync(
+    fs.appendFileSync(
       file,
-      JSON.stringify([{ prompt: message, completion: response }])
+      JSON.stringify({ prompt: message, completion: response }) + "\n"
     );
   }
-
   return;
+};
+
+const uploadFile = async (apiKey, file) => {
+  const configuration = new Configuration({
+    apiKey,
+  });
+
+  const openai = new OpenAIApi(configuration);
+  const spinner = loadWithRocketGradient("Upload file...").start();
+  const response = await openai
+    .createFile(fs.createReadStream(file), "fine-tune")
+    .then((res) => {
+      spinner.stop();
+      return res;
+    });
+  return response.data;
+};
+
+const fineTune = async (apiKey, fileID) => {
+  const configuration = new Configuration({
+    apiKey,
+  });
+
+  const openai = new OpenAIApi(configuration);
+  const spinner = loadWithRocketGradient("Fine tuning...").start();
+  const response = await openai
+    .createFineTune({
+      training_file: fileID,
+    })
+    .then((res) => {
+      spinner.stop();
+      return res;
+    });
+  return response.data;
 };
 
 let context = "";
@@ -42,7 +71,7 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
   try {
     let innerContext = getContext();
     const tgptModel = `${model}-terminal-gpt`;
-    const file = `${__dirname}/../data/${tgptModel}.json`;
+    const file = `${__dirname}/../data/${tgptModel}.jsonl`;
     const configuration = new Configuration({
       apiKey,
     });
@@ -80,7 +109,9 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
     }
 
     appendToFile(file, prompt, request.data.choices[0].text);
-    // const getTrainingModel = await trainModel(apiKey, file, tgptModel);
+    const uploadedFile = await uploadFile(apiKey, file);
+    const fineTuning = await fineTune(apiKey, uploadedFile.id);
+    console.log(fineTuning);
 
     addContext(request.data.choices[0].text);
     return request;

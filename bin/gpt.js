@@ -108,11 +108,12 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
       throw new Error("Something went wrong!");
     }
 
+    /*
     appendToFile(file, prompt, request.data.choices[0].text);
     const uploadedFile = await uploadFile(apiKey, file);
     const fineTuning = await fineTune(apiKey, uploadedFile.id);
     console.log(fineTuning);
-
+    */
     addContext(request.data.choices[0].text);
     return request;
   } catch (error) {

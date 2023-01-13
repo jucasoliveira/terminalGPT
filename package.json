@@ -1,6 +1,6 @@
 {
   "name": "terminalgpt",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "index.js",
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {

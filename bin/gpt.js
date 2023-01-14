@@ -8,7 +8,7 @@ const appendToFile = (file, message, response) => {
   // append to file with the structure {"prompt": messge, "completion": response}
 
   if (!fs.existsSync(file)) {
-    fs.createWriteStream(file).on("open", function (fd) {
+    fs.createWriteStream(file).on("open", function(fd) {
       fs.appendFileSync(
         fd,
         JSON.stringify({ prompt: message, completion: response }) + "\n"
@@ -93,11 +93,32 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
         if (err["response"]["status"] == "429") {
           console.error(
             `${chalk.red(
-              "\nChat GPT is having too many requests, wait and send it again."
+              "\nAPI Rate Limit Exceeded: ChatGPT is getting too many requests from the user in a short period of time. Please wait a while before sending another message."
             )}`
           );
+        }
+        if (err["response"]["status"] == "400") {
+          console.error(
+            `${chalk.red(
+              "\nBad Request: Prompt provided is empty or too long. Prompt should be between 1 and 4096 tokens."
+            )}`
+          );
+        }        
+        if (err["response"]["status"] == "402") {
+          console.error(
+            `${chalk.red(
+              "\nPayment Required: ChatGPT quota exceeded. Please check you chatGPT account."
+            )}`
+          );
+        }
+        if (err["response"]["status"] == "503") {
+          console.error(
+            `${chalk.red(
+              "\nService Unavailable: ChatGPT is currently unavailable, possibly due to maintenance or high traffic. Please try again later."
+            )}`
+          );     
         } else {
-          console.error(`${chalk.red("Something went wrong!!")} ${err}`);
+          console.error(`${chalk.red("Something went wrong!!!")} ${err}`);
         }
 
         spinner.stop();

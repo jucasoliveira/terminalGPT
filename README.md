@@ -83,3 +83,8 @@ Use the steps below:
 
 <br>
 
+## ✨ Contributors
+
+<a href="https://github.com/jucasoliveira/terminalGPT/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jucasoliveira/terminalGPT" />
+</a>

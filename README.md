@@ -86,3 +86,21 @@ Use the steps below:
 3. On your terminal and type `npm run chat`. Your terminalGPT will start. 😊
 
 <br>
+
+## Extra / Remove from your computer
+
+'npx terminalgpt' doesn't install the terminalgpt package, instead it downloads the package to your pc and directly executes it from the cache.
+
+You can find the package using
+
+`ls ~/.npm/_npx/*/node_modules`
+
+To delete the package, you can use
+
+`rm -r ~/.npm/_npx/*/node_modules/terminalgpt`
+
+## ✨ Contributors
+
+<a href="https://github.com/jucasoliveira/terminalGPT/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jucasoliveira/terminalGPT" />
+</a>

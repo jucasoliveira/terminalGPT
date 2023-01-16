@@ -29,6 +29,10 @@ const saveApiKey = (apiKey) => {
   fs.writeFileSync(`${__dirname}/apiKey.txt`, apiKey);
 };
 
+const deleteApiKey = () => {
+  fs.unlinkSync(`${__dirname}/apiKey.txt`);
+};
+
 const getApiKey = () => {
   if (fs.existsSync(`${__dirname}/apiKey.txt`)) {
     const getEncryptedScript = fs.readFileSync(
@@ -41,4 +45,4 @@ const getApiKey = () => {
   return null;
 };
 
-module.exports = { encrypt, decrypt, saveApiKey, getApiKey };
+module.exports = { encrypt, decrypt, saveApiKey, getApiKey, deleteApiKey };

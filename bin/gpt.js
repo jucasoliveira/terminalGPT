@@ -8,7 +8,7 @@ const appendToFile = (file, message, response) => {
   // append to file with the structure {"prompt": messge, "completion": response}
 
   if (!fs.existsSync(file)) {
-    fs.createWriteStream(file).on("open", function(fd) {
+    fs.createWriteStream(file).on("open", function (fd) {
       fs.appendFileSync(
         fd,
         JSON.stringify({ prompt: message, completion: response }) + "\n"
@@ -58,6 +58,9 @@ const fineTune = async (apiKey, fileID) => {
 };
 
 let context = "";
+let converstationLimit = 0;
+
+let fineTunneModel = "ft-uoLuoAhMJC9F3VECU8N9VK6q";
 
 const addContext = (text) => {
   context = `${context}\n${text}`;
@@ -65,6 +68,19 @@ const addContext = (text) => {
 
 const getContext = () => {
   return context;
+};
+
+const setFineTuneModel = (model) => {
+  fineTunneModel = model;
+};
+
+const getFineTuneModel = () => {
+  return fineTunneModel;
+};
+
+const checkModel = (options) => {
+  if (options.finetunning) return fineTunneModel;
+  return options.engine || "text-davinci-002";
 };
 
 const generateCompletion = async (apiKey, model, prompt, options) => {
@@ -78,9 +94,10 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
 
     const openai = new OpenAIApi(configuration);
     const spinner = loadWithRocketGradient("Thinking...").start();
+    console.log(checkModel(options));
     const request = await openai
       .createCompletion({
-        model: options.engine || "text-davinci-002",
+        model: checkModel(options),
         prompt: `${innerContext}\n${prompt}`,
         max_tokens: 2048,
         temperature: parseInt(options.temperature) || 0.5,
@@ -103,7 +120,7 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
               "\nBad Request: Prompt provided is empty or too long. Prompt should be between 1 and 4096 tokens."
             )}`
           );
-        }        
+        }
         if (err["response"]["status"] == "402") {
           console.error(
             `${chalk.red(
@@ -116,7 +133,7 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
             `${chalk.red(
               "\nService Unavailable: ChatGPT is currently unavailable, possibly due to maintenance or high traffic. Please try again later."
             )}`
-          );     
+          );
         } else {
           console.error(`${chalk.red("Something went wrong!!!")} ${err}`);
         }
@@ -129,13 +146,21 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
       throw new Error("Something went wrong!");
     }
 
-    /*
-    appendToFile(file, prompt, request.data.choices[0].text);
-    const uploadedFile = await uploadFile(apiKey, file);
-    const fineTuning = await fineTune(apiKey, uploadedFile.id);
-    console.log(fineTuning);
-    */
-    addContext(request.data.choices[0].text);
+    if (options.finetunning) {
+      converstationLimit = converstationLimit + 1;
+      appendToFile(file, prompt, request.data.choices[0].text);
+      if (converstationLimit === 5) {
+        const uploadedFile = await uploadFile(apiKey, file);
+        const fineTuning = await fineTune(apiKey, uploadedFile.id);
+        setFineTuneModel(fineTuning.id);
+        addContext("");
+      } else {
+        addContext(request.data.choices[0].text);
+      }
+    } else {
+      addContext(request.data.choices[0].text);
+    }
+
     return request;
   } catch (error) {
     console.error(`${chalk.red("Something went wrong!!")} ${error}`);

@@ -1,5 +1,6 @@
 const gradient = require("gradient-string");
 const chalk = require("chalk");
+const marked = require("marked");
 
 const intro = () => {
   const duck = ` ${gradient("orange", "yellow").multiline(
@@ -23,10 +24,11 @@ const intro = () => {
 
     To exit, type "${chalk.redBright("exit")}" and press enter.
 
+    # Commands
 
   `;
 
-  console.log(usageText.padEnd(10, " "));
+  console.log(usageText);
 };
 
 module.exports = {

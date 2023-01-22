@@ -17,6 +17,7 @@ commander
     "-f,--finetunning <finetunning>",
     "Opt in to pretrain the model with a prompt"
   )
+  .option("-l,--limit <limit>", "The limit of prompts to train the model with")
   .usage(`"<project-directory>" [options]`)
   .action(async (options) => {
     intro();

@@ -1,12 +1,14 @@
 {
   "name": "terminalgpt",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "main": "index.js",
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {
+    "tgpt": "node bin/index.js",
     "test": "jest --ci --coverage --verbose",
-    "chat": "node bin/index.js chat --engine text-davinci-002 --temperature 0.7",
-    "delete": "node bin/index.js delete"
+    "dev": "node bin/index.js chat --engine text-davinci-002 --temperature 0.7",
+    "tunne": "node bin/index.js chat --engine text-davinci-003 --temperature 0.7 --finetunning true --limit 1",
+    "dev:delete": "node bin/index.js delete"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,9 @@
   "bugs": {
     "url": "https://github.com/jucasoliveira/terminalGPT/issues"
   },
-  "bin": "bin/index.js",
+  "bin": {
+    "tgpt": "bin/index.js"
+  },
   "homepage": "https://github.com/jucasoliveira/terminalGPT#readme",
   "dependencies": {
     "chalk": "^4.1.2",
@@ -26,6 +30,8 @@
     "crypto": "^1.0.1",
     "gradient-string": "^2.0.2",
     "lowdb": "^5.0.5",
+    "markdown": "^0.5.0",
+    "marked": "^4.2.12",
     "openai": "^3.1.0",
     "ora": "^5.4.1",
     "prompts": "^2.4.2"

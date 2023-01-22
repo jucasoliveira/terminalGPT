@@ -13,8 +13,13 @@ commander
   .command("chat")
   .option("-e, --engine <engine>", "GPT-3 model to use")
   .option("-t, --temperature <temperature>", "Response temperature")
+  .option(
+    "-f,--finetunning <finetunning>",
+    "Opt in to pretrain the model with a prompt"
+  )
+  .option("-l,--limit <limit>", "The limit of prompts to train the model with")
   .usage(`"<project-directory>" [options]`)
-  .action((options) => {
+  .action(async (options) => {
     intro();
     apiKeyPrompt().then((apiKey) => {
       const prompt = async () => {

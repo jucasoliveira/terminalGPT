@@ -32,11 +32,49 @@ You'll need to have your own `OpenAi` apikey to operate this package.
 
 # Get Started
 
+# Using tgpt
+
 ```
- npx terminalgpt
+npm -g terminalgpt
 ```
 
-# Run
+or
+
+```
+yarn add global terminalgpt
+```
+
+### Run
+
+```bash
+tgpt chat
+```
+
+ps.: If it is your first time running it, it will ask for open AI key , `paste generated key from pre-requisite steps`
+
+### Changing engine and temperature
+
+```
+tgpt chat --engine "text-davinci-002" --temperature 0.7
+```
+
+### Changing api key
+
+It you are not satisfy or ented a wrong api key , run
+
+```
+tgpt delete
+```
+
+# Using with npx
+
+```
+
+npx terminalgpt
+
+```
+
+### Run
 
 ```bash
 npx terminalgpt chat
@@ -44,13 +82,13 @@ npx terminalgpt chat
 
 ps.: If it is your first time running it, it will ask for open AI key , `paste generated key from pre-requisite steps`
 
-# Changing engine and temperature
+### Changing engine and temperature
 
 ```
 npx terminalgpt chat --engine "text-davinci-002" --temperature 0.7
 ```
 
-## Changing api key
+### Changing api key
 
 If you are not satisfed or entered a wrong api key, run
 

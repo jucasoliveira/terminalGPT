@@ -35,7 +35,7 @@ You'll need to have your own `OpenAi` apikey to operate this package.
 # Using tgpt
 
 ```
-npm -g terminalgpt
+npm -g install terminalgpt
 ```
 
 or

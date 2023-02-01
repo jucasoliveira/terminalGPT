@@ -1,6 +1,6 @@
 {
   "name": "terminalgpt",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "index.js",
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {
@@ -26,7 +26,9 @@
   "homepage": "https://github.com/jucasoliveira/terminalGPT#readme",
   "dependencies": {
     "chalk": "^4.1.2",
+    "clipboardy": "2.3.0",
     "commander": "^9.4.1",
+    "compromise": "^14.8.1",
     "crypto": "^1.0.1",
     "gradient-string": "^2.0.2",
     "lowdb": "^5.0.5",

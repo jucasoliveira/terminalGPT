@@ -1,3 +1,4 @@
+const clipboard = require("clipboardy");
 const { encrypt, saveApiKey, getApiKey } = require("./encrypt");
 const prompts = require("prompts");
 const chalk = require("chalk");
@@ -22,6 +23,31 @@ const apiKeyPrompt = async () => {
   }
 
   return apiKey;
+};
+
+const checkBlockOfCode = async (text, prompt) => {
+  // get all matches of text within ```
+  const regex = /```[\s\S]*?```/g;
+  const matches = text.match(regex);
+  if (!matches) {
+    prompt();
+  } else {
+    const recentText = matches[0];
+    const recentTextNoBackticks = recentText.replace(/```/g, "");
+    const response = await prompts({
+      type: "confirm",
+      name: "copy",
+      message: `Copy recent code to clipboard?`,
+      initial: true,
+    });
+
+    if (response.copy) {
+      clipboard.writeSync(recentTextNoBackticks);
+      prompt();
+    } else {
+      prompt();
+    }
+  }
 };
 
 const generateResponse = async (apiKey, prompt, options, response) => {
@@ -50,7 +76,7 @@ const generateResponse = async (apiKey, prompt, options, response) => {
       } else {
         clearInterval(interval);
         console.log("\n");
-        prompt();
+        checkBlockOfCode(getText[0], prompt);
       }
     }, 10);
   } catch (err) {

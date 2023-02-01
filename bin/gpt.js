@@ -1,132 +1,14 @@
 const { Configuration, OpenAIApi } = require("openai");
 const chalk = require("chalk");
-const fs = require("fs");
 const { loadWithRocketGradient } = require("./gradient");
+const { getContext, addContext } = require("./context");
+const { appendToFile, uploadFile } = require("./file");
+const { fineTune, getFineTuneModel, setFineTuneModel } = require("./fineTune");
 
-// variables
-let context = "";
 let converstationLimit = 0;
-
-let fineTunneModel = "";
-
-//getters and setters
-
-const addContext = (text) => {
-  context = `${context}\n ${text}`;
-};
-
-const getContext = () => {
-  return context;
-};
-
-const setFineTuneModel = (model) => {
-  fineTunneModel = model;
-};
-
-const getFineTuneModel = () => {
-  return fineTunneModel;
-};
 
 const checkModel = (options) => {
   return getFineTuneModel() || options.engine || "text-davinci-002";
-};
-
-// API calls
-
-const appendToFile = (file, message, response) => {
-  // find file, if not , create it
-  // append to file with the structure {"prompt": messge, "completion": response}
-
-  if (!fs.existsSync(file)) {
-    fs.createWriteStream(file).on("open", function (fd) {
-      fs.appendFileSync(
-        fd,
-        JSON.stringify({ prompt: message, completion: response }) + "\n"
-      );
-    });
-  } else {
-    fs.appendFileSync(
-      file,
-      JSON.stringify({ prompt: message, completion: response }) + "\n"
-    );
-  }
-  return;
-};
-
-const retrieveFile = async (apiKey, fileID) => {
-  const { Configuration, OpenAIApi } = require("openai");
-  const configuration = new Configuration({
-    apiKey: apiKey,
-  });
-  const openai = new OpenAIApi(configuration);
-  const response = await openai.retrieveFile(fileID);
-  // while the file status is not "processed" , wait 5 seconds and try again
-  while (response.data.status !== "processed") {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    const newRetrieve = await openai.retrieveFile(fileID);
-    if (newRetrieve.data.status === "processed") {
-      return;
-    }
-  }
-};
-
-const uploadFile = async (apiKey, file) => {
-  try {
-    const configuration = new Configuration({
-      apiKey,
-    });
-
-    const openai = new OpenAIApi(configuration);
-    const spinner = loadWithRocketGradient("Upload file...").start();
-    const response = await openai
-      .createFile(fs.createReadStream(file), "fine-tune")
-      .then((res) => {
-        return res;
-      });
-
-    await retrieveFile(apiKey, response.data.id);
-    spinner.stop();
-    return response.data;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const retrieveFineTune = async (apiKey, tunneID) => {
-  const { Configuration, OpenAIApi } = require("openai");
-  const configuration = new Configuration({
-    apiKey: apiKey,
-  });
-  const openai = new OpenAIApi(configuration);
-  const response = await openai.retrieveFineTune(tunneID);
-  while (response.data.status !== "succeeded") {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    const newRetrieve = await openai.retrieveFineTune(tunneID);
-    if (newRetrieve.data.status === "succeeded") {
-      return;
-    }
-  }
-};
-
-const fineTune = async (apiKey, fileID) => {
-  const configuration = new Configuration({
-    apiKey,
-  });
-
-  const openai = new OpenAIApi(configuration);
-  const spinner = loadWithRocketGradient("Fine tuning...").start();
-  const response = await openai
-    .createFineTune({
-      training_file: fileID,
-      model: "text-davinci-003",
-    })
-    .then((res) => {
-      return res;
-    });
-
-  await retrieveFineTune(apiKey, response.data.id);
-  spinner.stop();
-  return response.data;
 };
 
 const generateCompletion = async (apiKey, model, prompt, options) => {
@@ -140,17 +22,20 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
 
     const openai = new OpenAIApi(configuration);
     const spinner = loadWithRocketGradient("Thinking...").start();
-    addContext(`User: ${prompt}\n`);
+    addContext(`${prompt}\n`);
 
     const request = await openai
       .createCompletion({
         model: checkModel(options),
-        prompt: `${innerContext}\n${prompt}\n when writing code , return in code block markdown`,
+        prompt: `Read the context, analyze and return an answer for the prompt,always wrapping block of code exactly within triple backticks.\nContext:${innerContext}\nPrompt:${prompt}\n`,
         max_tokens: 2048,
-        temperature: parseInt(options.temperature) || 0.5,
+        temperature: parseInt(options.temperature) || 0.7,
+        top_p: 1,
+        frequency_penalty: 0,
+        presence_penalty: 0,
       })
       .then((res) => {
-        addContext(`GPT-3: ${res.data.choices[0].text}`);
+        addContext(`${res.data.choices[0].text}`);
         spinner.stop();
         return res;
       })

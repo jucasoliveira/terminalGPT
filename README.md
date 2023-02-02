@@ -41,7 +41,7 @@ npm -g install terminalgpt
 or
 
 ```
-yarn add global terminalgpt
+yarn global add terminalgpt
 ```
 
 ### Run
@@ -60,7 +60,7 @@ tgpt chat --engine "text-davinci-002" --temperature 0.7
 
 ### Changing api key
 
-It you are not satisfy or ented a wrong api key , run
+It you are not satisfy or added a wrong api key , run
 
 ```
 tgpt delete
@@ -90,7 +90,7 @@ npx terminalgpt chat --engine "text-davinci-002" --temperature 0.7
 
 ### Changing api key
 
-If you are not satisfed or entered a wrong api key, run
+If you are not satisfied or entered a wrong api key, run
 
 ```
 npx terminalgpt delete

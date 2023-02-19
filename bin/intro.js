@@ -17,7 +17,7 @@ const intro = () => {
   ${duck}
 
   ${chalk.yellowBright("usage:")}
-    TerminalGPT will ask you to add your OpenAI API key. Don't worry, it's saves on your machine locally.
+    TerminalGPT will ask you to add your OpenAI API key. Don't worry, it will be saved on your machine locally.
 
     Terminal will prompt you to enter a message. Type your message and press enter.
     Terminal will then prompt you to enter a response. Type your response and press enter.

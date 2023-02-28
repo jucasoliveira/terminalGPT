@@ -30,6 +30,11 @@ commander
           validate: () => {
             return true;
           },
+          onState: (state) => {
+            if (state.aborted) {
+              process.exit(0);
+            }
+          }
         });
 
         switch (response.value) {

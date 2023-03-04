@@ -28,7 +28,7 @@ Get GPT-like chatGPT on your terminal
 You'll need to have your own `OpenAi` apikey to operate this package.
 
 1. Go to <https://beta.openai.com>
-2. Select you profile menu and go to `Manage API Keys`
+2. Select you profile menu and go to `View API Keys`
 3. Select `+ Create new secret key`
 4. Copy generated key
 

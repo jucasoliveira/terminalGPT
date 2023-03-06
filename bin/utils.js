@@ -50,21 +50,19 @@ const checkBlockOfCode = async (text, prompt) => {
   }
 };
 
-const generateResponse = async (apiKey, prompt, options, response) => {
+const generateResponse = async (apiKey, prompt, response) => {
   try {
     const request = await generateCompletion(
       apiKey,
-      options.engine || "text-davinci-002",
-      response.value,
-      options
+      response.value
     );
 
-    if (request == undefined || !request.data?.choices?.[0].text) {
+    if (request == undefined || !request?.content) {
       throw new Error("Something went wrong!");
     }
 
     // map all choices to text
-    const getText = request.data.choices.map((choice) => choice.text);
+    const getText = [request.content];
 
     console.log(`${chalk.cyan("GPT-3: ")}`);
     // console log each character of the text with a delay and then call prompt when it finished

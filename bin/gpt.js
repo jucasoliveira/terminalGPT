@@ -22,25 +22,22 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
 
     const openai = new OpenAIApi(configuration);
     const spinner = loadWithRocketGradient("Thinking...").start();
-    addContext(`${prompt}\n`);
+    
+    addContext({"role": "user", "content": prompt});
+    addContext({"role": "system", "content": "Read the context, when returning the answer ,always wrapping block of code exactly within triple backticks"});
 
-    const request = await openai
-      .createCompletion({
-        model: checkModel(options),
-        prompt: `Read the context, analyze and return an answer for the prompt,always wrapping block of code exactly within triple backticks.\nContext:${innerContext}\nPrompt:${prompt}\n`,
-        max_tokens: 2048,
-        temperature: parseInt(options.temperature) || 0.7,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0,
-      })
+    // context + promp + system
+
+    const request = await openai.ChatCompletion.create(
+      model="gpt-3.5-turbo",
+      messages=getContext(),
+    )
       .then((res) => {
-        addContext(`${res.data.choices[0].text}`);
+        addContext(res.data.choices[0].message);
         spinner.stop();
         return res;
       })
       .catch((err) => {
-        checkModel(options);
         if (err["response"]["status"] == "404") {
           console.error(
             `${chalk.red(
@@ -86,17 +83,7 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
     if (request == undefined || !request.data?.choices?.[0].text) {
       throw new Error("Something went wrong!");
     }
-
-    if (options.finetunning) {
-      converstationLimit = converstationLimit + 1;
-      appendToFile(file, prompt, request.data.choices[0].text);
-      if (converstationLimit === parseInt(options.limit)) {
-        const uploadedFile = await uploadFile(apiKey, file);
-        const fineTuning = await fineTune(apiKey, uploadedFile.id);
-        setFineTuneModel(fineTuning.fine_tuned_model);
-        addContext("");
-      }
-    }
+    
     return request;
   } catch (error) {
     console.error(`${chalk.red("Something went wrong!!")} ${error}`);

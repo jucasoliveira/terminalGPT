@@ -19,7 +19,7 @@ commander
   )
   .option("-l,--limit <limit>", "The limit of prompts to train the model with")
   .usage(`"<project-directory>" [options]`)
-  .action(async (options) => {
+  .action(async () => {
     intro();
     apiKeyPrompt().then((apiKey) => {
       const prompt = async () => {
@@ -43,7 +43,7 @@ commander
           case "clear":
             return process.stdout.write("\x1Bc");
           default:
-            generateResponse(apiKey, prompt, options, response);
+            generateResponse(apiKey, prompt, response);
             return;
         }
       };

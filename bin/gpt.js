@@ -2,20 +2,11 @@ const { Configuration, OpenAIApi } = require("openai");
 const chalk = require("chalk");
 const { loadWithRocketGradient } = require("./gradient");
 const { getContext, addContext } = require("./context");
-const { appendToFile, uploadFile } = require("./file");
-const { fineTune, getFineTuneModel, setFineTuneModel } = require("./fineTune");
 
-let converstationLimit = 0;
 
-const checkModel = (options) => {
-  return getFineTuneModel() || options.engine || "text-davinci-002";
-};
-
-const generateCompletion = async (apiKey, model, prompt, options) => {
+const generateCompletion = async (apiKey, prompt) => {
   try {
-    let innerContext = getContext();
-    const tgptModel = `${model}-terminal-gpt`;
-    const file = `${__dirname}/../data/${tgptModel}.jsonl`;
+    
     const configuration = new Configuration({
       apiKey,
     });
@@ -26,16 +17,14 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
     addContext({"role": "user", "content": prompt});
     addContext({"role": "system", "content": "Read the context, when returning the answer ,always wrapping block of code exactly within triple backticks"});
 
-    // context + promp + system
-
-    const request = await openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
-      messages=getContext(),
-    )
+    const request = await openai.createChatCompletion({
+      model:"gpt-3.5-turbo",
+      messages:getContext(),
+    })
       .then((res) => {
         addContext(res.data.choices[0].message);
         spinner.stop();
-        return res;
+        return res.data.choices[0].message;
       })
       .catch((err) => {
         if (err["response"]["status"] == "404") {
@@ -80,10 +69,10 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
         return "error";
       });
 
-    if (request == undefined || !request.data?.choices?.[0].text) {
+    if (request == undefined || !request?.content) {
       throw new Error("Something went wrong!");
     }
-    
+
     return request;
   } catch (error) {
     console.error(`${chalk.red("Something went wrong!!")} ${error}`);
@@ -91,6 +80,5 @@ const generateCompletion = async (apiKey, model, prompt, options) => {
 };
 
 module.exports = {
-  appendToFile,
   generateCompletion,
 };

@@ -5,15 +5,6 @@ let context = [];
 
 const addContext = (text) => {
   context = [...context, text];
-  /*
-  if (!fs.existsSync(contextFile)) {
-    fs.createWriteStream(contextFile).on("open", function (fd) {
-      fs.appendFileSync(fd, text + "\n");
-    });
-  } else {
-    fs.appendFileSync(contextFile, text + "\n");
-  }
-  */
 };
 
 const getContext = () => {

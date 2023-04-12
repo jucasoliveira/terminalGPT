@@ -97,7 +97,7 @@ const generateResponse = async (apiKey, prompt, response) => {
       case "yes":
       default:
         // call the function again
-        generateResponse(apiKey, prompt, options, response);
+        generateResponse(apiKey, prompt, response);
         break;
     }
   }

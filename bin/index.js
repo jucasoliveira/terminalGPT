@@ -18,8 +18,9 @@ commander
     "Opt in to pretrain the model with a prompt"
   )
   .option("-l,--limit <limit>", "The limit of prompts to train the model with")
+  .option("-m,--markdown", "Show markdown in the terminal")
   .usage(`"<project-directory>" [options]`)
-  .action(async () => {
+  .action(async (opts) => {
     intro();
     apiKeyPrompt().then((apiKey) => {
       const prompt = async () => {
@@ -43,7 +44,7 @@ commander
           case "clear":
             return process.stdout.write("\x1Bc");
           default:
-            generateResponse(apiKey, prompt, response);
+            generateResponse(apiKey, prompt, response, opts.markdown);
             return;
         }
       };

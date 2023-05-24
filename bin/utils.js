@@ -3,7 +3,13 @@ const { encrypt, saveApiKey, getApiKey } = require("./encrypt");
 const prompts = require("prompts");
 const chalk = require("chalk");
 const process = require("process");
+const marked = require("marked");
+const TerminalRenderer = require('marked-terminal')
 const { generateCompletion } = require("./gpt");
+
+marked.setOptions({
+  renderer: new TerminalRenderer()
+});
 
 const apiKeyPrompt = async () => {
   let apiKey = getApiKey();
@@ -50,7 +56,7 @@ const checkBlockOfCode = async (text, prompt) => {
   }
 };
 
-const generateResponse = async (apiKey, prompt, response) => {
+const generateResponse = async (apiKey, prompt, response, isShowMarkdown = false) => {
   try {
     const request = await generateCompletion(
       apiKey,
@@ -65,18 +71,24 @@ const generateResponse = async (apiKey, prompt, response) => {
     const getText = [request.content];
 
     console.log(`${chalk.cyan("GPT-3: ")}`);
-    // console log each character of the text with a delay and then call prompt when it finished
-    let i = 0;
-    const interval = setInterval(() => {
-      if (i < getText[0].length) {
-        process.stdout.write(getText[0][i]);
-        i++;
-      } else {
-        clearInterval(interval);
-        console.log("\n");
-        checkBlockOfCode(getText[0], prompt);
-      }
-    }, 10);
+
+    if (isShowMarkdown) {
+      console.log(marked.parse(getText[0]))
+      checkBlockOfCode(getText[0], prompt);
+    } else {
+      // console log each character of the text with a delay and then call prompt when it finished
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < getText[0].length) {
+          process.stdout.write(marked.parse(getText[0][i]));
+          i++;
+        } else {
+          clearInterval(interval);
+          console.log("\n");
+          checkBlockOfCode(getText[0], prompt);
+        }
+      }, 10);
+    }
   } catch (err) {
     console.error(`${chalk.red("1 Something went wrong!!")} ${err}`);
     // create a prompt of type select , with the options to exit or try again

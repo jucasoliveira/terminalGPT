@@ -56,11 +56,12 @@ const checkBlockOfCode = async (text, prompt) => {
   }
 };
 
-const generateResponse = async (apiKey, prompt, response, isShowMarkdown = false) => {
+const generateResponse = async (apiKey, prompt, response, opts) => {
   try {
     const request = await generateCompletion(
       apiKey,
-      response.value
+      response.value,
+      opts
     );
 
     if (request == undefined || !request?.content) {
@@ -70,10 +71,9 @@ const generateResponse = async (apiKey, prompt, response, isShowMarkdown = false
     // map all choices to text
     const getText = [request.content];
 
-    console.log(`${chalk.cyan("GPT-3: ")}`);
+    console.log(`${chalk.cyan("GPT: ")}`);
 
-    if (isShowMarkdown) {
-      console.log()
+    if (opts.markdown) {
       const markedText = marked.parse(getText[0]);
       let i = 0;
       const interval = setInterval(() => {
@@ -86,7 +86,6 @@ const generateResponse = async (apiKey, prompt, response, isShowMarkdown = false
           checkBlockOfCode(markedText, prompt);
         }
       }, 10);
-      // checkBlockOfCode(getText[0], prompt);
     } else {
       // console log each character of the text with a delay and then call prompt when it finished
       let i = 0;
@@ -121,7 +120,7 @@ const generateResponse = async (apiKey, prompt, response, isShowMarkdown = false
       case "yes":
       default:
         // call the function again
-        generateResponse(apiKey, prompt, response);
+        generateResponse(apiKey, prompt, response, opts);
         break;
     }
   }

@@ -73,18 +73,30 @@ const generateResponse = async (apiKey, prompt, response, isShowMarkdown = false
     console.log(`${chalk.cyan("GPT-3: ")}`);
 
     if (isShowMarkdown) {
-      console.log(marked.parse(getText[0]))
-      checkBlockOfCode(getText[0], prompt);
+      console.log()
+      const markedText = marked.parse(getText[0]);
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < markedText.length) {
+          process.stdout.write(markedText[i]);
+          i++;
+        } else {
+          clearInterval(interval);
+          process.stdout.write('\n'); // Add this line
+          checkBlockOfCode(markedText, prompt);
+        }
+      }, 10);
+      // checkBlockOfCode(getText[0], prompt);
     } else {
       // console log each character of the text with a delay and then call prompt when it finished
       let i = 0;
       const interval = setInterval(() => {
         if (i < getText[0].length) {
-          process.stdout.write(marked.parse(getText[0][i]));
+          process.stdout.write(getText[0][i]);
           i++;
         } else {
           clearInterval(interval);
-          console.log("\n");
+          process.stdout.write('\n'); // Add this line
           checkBlockOfCode(getText[0], prompt);
         }
       }, 10);

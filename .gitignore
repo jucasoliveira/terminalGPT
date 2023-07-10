@@ -105,3 +105,4 @@ dist
 
 *.txt
 *.jsonl
+.yarn

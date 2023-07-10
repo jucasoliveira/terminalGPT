@@ -14,8 +14,8 @@ const generateCompletion = async (apiKey, prompt, opts) => {
     const openai = new OpenAIApi(configuration);
     const spinner = loadWithRocketGradient("Thinking...").start();
     
+    addContext({"role": "system", "content": "Read the context, when returning the answer , always wrapping block of code exactly within triple backticks "});
     addContext({"role": "user", "content": prompt});
-    addContext({"role": "system", "content": "Read the context, when returning the answer ,always wrapping block of code exactly within triple backticks"});
 
     const request = await openai.createChatCompletion({
       model: opts.engine || "gpt-3.5-turbo",

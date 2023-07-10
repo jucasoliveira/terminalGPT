@@ -4,7 +4,7 @@ const { loadWithRocketGradient } = require("./gradient");
 const { getContext, addContext } = require("./context");
 
 
-const generateCompletion = async (apiKey, prompt) => {
+const generateCompletion = async (apiKey, prompt, opts) => {
   try {
     
     const configuration = new Configuration({
@@ -18,8 +18,9 @@ const generateCompletion = async (apiKey, prompt) => {
     addContext({"role": "system", "content": "Read the context, when returning the answer ,always wrapping block of code exactly within triple backticks"});
 
     const request = await openai.createChatCompletion({
-      model:"gpt-3.5-turbo",
-      messages:getContext(),
+      model: opts.engine || "gpt-3.5-turbo",
+      messages: getContext(),
+      temperature: opts.temperature ? Number(opts.temperature) : 1,
     })
       .then((res) => {
         addContext(res.data.choices[0].message);

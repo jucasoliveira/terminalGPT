@@ -11,13 +11,8 @@ const { deleteApiKey } = require("./encrypt");
 
 commander
   .command("chat")
-  .option("-e, --engine <engine>", "GPT-3 model to use")
+  .option("-e, --engine <engine>", "GPT model to use")
   .option("-t, --temperature <temperature>", "Response temperature")
-  .option(
-    "-f,--finetunning <finetunning>",
-    "Opt in to pretrain the model with a prompt"
-  )
-  .option("-l,--limit <limit>", "The limit of prompts to train the model with")
   .option("-m,--markdown", "Show markdown in the terminal")
   .usage(`"<project-directory>" [options]`)
   .action(async (opts) => {
@@ -44,7 +39,7 @@ commander
           case "clear":
             return process.stdout.write("\x1Bc");
           default:
-            generateResponse(apiKey, prompt, response, opts.markdown);
+            generateResponse(apiKey, prompt, response, opts);
             return;
         }
       };

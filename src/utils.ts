@@ -1,17 +1,23 @@
-const clipboard = require("clipboardy");
-const {encrypt, saveApiKey, getApiKey} = require("./encrypt");
-const prompts = require("prompts");
-const chalk = require("chalk");
-const process = require("process");
-const marked = require("marked");
-const TerminalRenderer = require('marked-terminal')
-const {generateCompletion} = require("./gpt");
+import * as clipboard from "clipboardy";
+import {encrypt, getApiKey, getCustomUrl, saveApiKey} from "./encrypt";
+import prompts from "prompts";
+
+import chalk from "chalk";
+
+import * as process from "process";
+
+import {marked} from "marked";
+
+import TerminalRenderer from "marked-terminal";
+
+import generateCompletion from "./gpt";
+
 
 marked.setOptions({
     renderer: new TerminalRenderer()
 });
 
-const apiKeyPrompt = async () => {
+export async function apiKeyPrompt() {
     let apiKey = getApiKey();
 
     if (!apiKey) {
@@ -25,21 +31,18 @@ const apiKeyPrompt = async () => {
         });
 
         apiKey = response.apiKey;
-        saveApiKey(encrypt(apiKey));
+        saveApiKey(encrypt(response.apiKey));
     }
 
     return apiKey;
-};
+}
 
-const checkBlockOfCode = async (text, prompt) => {
+async function checkBlockOfCode(text: string) {
     // get all matches of text within ```
     const regex = /```[\s\S]*?```/g;
     const matches = text.match(regex);
-    if (!matches) {
-        prompt();
-    } else {
-        const recentText = matches[0];
-        const recentTextNoBackticks = recentText.replace(/```/g, "");
+    if (matches) {
+        const recentTextNoBackticks = matches[0].replace(/```/g, "");
         const response = await prompts({
             type: "confirm",
             name: "copy",
@@ -49,20 +52,26 @@ const checkBlockOfCode = async (text, prompt) => {
 
         if (response.copy) {
             clipboard.writeSync(recentTextNoBackticks);
-            prompt();
-        } else {
-            prompt();
         }
     }
-};
+}
 
-const generateResponse = async (apiKey, prompt, response, opts, default_path) => {
+export async function generateResponse(
+    apiKey: string,
+    prompt: (() => void),
+    response: prompts.Answers<string>,
+    opts: {
+        engine: string,
+        temperature: unknown,
+        markdown?: unknown
+    }
+) {
     try {
         const request = await generateCompletion(
             apiKey,
             response.value,
             opts,
-            default_path
+            getCustomUrl()
         );
 
         if (request === undefined || !request?.content) {
@@ -78,28 +87,32 @@ const generateResponse = async (apiKey, prompt, response, opts, default_path) =>
             const markedText = marked.parse(getText[0]);
             let i = 0;
             const interval = setInterval(() => {
-                if (i < markedText.length) {
-                    process.stdout.write(markedText[i]);
-                    i++;
-                } else {
-                    clearInterval(interval);
-                    process.stdout.write('\n'); // Add this line
-                    checkBlockOfCode(markedText, prompt);
-                }
-            }, 10);
+                    if (i < markedText.length) {
+                        process.stdout.write(markedText[i]);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        process.stdout.write('\n'); // Add this line
+                        checkBlockOfCode(markedText)
+                            .then(prompt)
+                    }
+                },
+                10);
         } else {
             // console log each character of the text with a delay and then call prompt when it finished
             let i = 0;
             const interval = setInterval(() => {
-                if (i < getText[0].length) {
-                    process.stdout.write(getText[0][i]);
-                    i++;
-                } else {
-                    clearInterval(interval);
-                    process.stdout.write('\n'); // Add this line
-                    checkBlockOfCode(getText[0], prompt);
-                }
-            }, 10);
+                    if (i < getText[0].length) {
+                        process.stdout.write(getText[0][i]);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        process.stdout.write('\n'); // Add this line
+                        checkBlockOfCode(getText[0])
+                            .then(prompt)
+                    }
+                },
+                10);
         }
     } catch (err) {
         console.error(`${chalk.red("Something went wrong!!")} ${err}`);
@@ -115,19 +128,10 @@ const generateResponse = async (apiKey, prompt, response, opts, default_path) =>
             initial: 0,
         });
 
-        switch (response.value) {
-            case "no":
-                return process.exit(0);
-            case "yes":
-            default:
-                // call the function again
-                generateResponse(apiKey, prompt, response, opts, default_path);
-                break;
+        if (response.value == "no") {
+            return process.exit(0);
         }
-    }
-};
 
-module.exports = {
-    apiKeyPrompt,
-    generateResponse
-};
+        generateResponse(apiKey, prompt, response, opts);
+    }
+}

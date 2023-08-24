@@ -1,9 +1,21 @@
-const {Configuration, OpenAIApi} = require("openai");
-const chalk = require("chalk");
-const {loadWithRocketGradient} = require("./gradient");
-const {getContext, addContext} = require("./context");
+import chalk from "chalk";
 
-const generateCompletion = async (apiKey, prompt, opts, url) => {
+import {Configuration, OpenAIApi} from "openai";
+
+import {addContext, getContext} from "./context";
+
+import {loadWithRocketGradient} from "./gradient";
+
+
+export default async (
+    apiKey: string | Promise<string>,
+    prompt: string,
+    opts: {
+        engine: string;
+        temperature: unknown;
+    },
+    url: string | undefined
+) => {
     const configuration = new Configuration({
         apiKey,
         basePath: url
@@ -24,9 +36,13 @@ const generateCompletion = async (apiKey, prompt, opts, url) => {
         temperature: opts.temperature ? Number(opts.temperature) : 1
     })
         .then((res) => {
-            addContext(res.data.choices[0].message);
-            spinner.stop();
-            return res.data.choices[0].message;
+            if (typeof res.data.choices[0].message !== 'undefined') {
+                addContext(res.data.choices[0].message);
+                spinner.stop();
+                return res.data.choices[0].message
+            } else {
+                throw new Error("Undefined messages received")
+            }
         })
         .catch((err) => {
             spinner.stop();
@@ -64,15 +80,10 @@ const generateCompletion = async (apiKey, prompt, opts, url) => {
                 default:
                     throw new Error(`${err}`);
             }
-        });
-
+        })
     if (request === undefined || !request?.content) {
         throw new Error("Undefined request or content");
     }
 
-    return request;
-};
-
-module.exports = {
-    generateCompletion,
-};
+    return request
+}

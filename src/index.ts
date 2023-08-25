@@ -8,7 +8,7 @@ import intro from "./intro";
 
 import {apiKeyPrompt, generateResponse} from "./utils";
 
-import {deleteApiKey} from "./encrypt";
+import {deleteApiKey, saveCustomUrl} from "./encrypt";
 
 import * as c from "commander";
 
@@ -78,23 +78,27 @@ commander
         console.log("API key deleted");
     });
 
-// commander
-//     .command("endpoint")
-//     .option("--set <url>", "Set your custom endpoint")
-//     .option("-r, --reset", "Reset the API endpoint to default ")
-//     .description("Configure your API endpoint")
-//     .action(async () => {
-//             console.log("Send empty to set default openai endpoint")
-//             prompts({
-//                 type: "text",
-//                 name: "value",
-//                 validate: (t) =>
-//                     t.search(/(https?:\/(\/.)+).*/g) === 0 || t === "" ? true : "Urls only allowed",
-//                 message: "Insert endpoint: "
-//             }).then(response => saveCustomUrl(/(https?:\/(\/.)+).*/g.test(response.value) ? response.value : undefined))
-//
-//
-//         }
-//     )
+commander
+    .command("endpoint")
+    .option("--set <url>", "Set your custom endpoint")
+    .option("-r, --reset", "Reset the API endpoint to default ")
+    .description("Configure your API endpoint")
+    .action(async () => {
+            console.log("Send empty to set default openai endpoint")
+            prompts({
+                type: "text",
+                name: "value",
+                validate: (t) =>
+                    t.search(/(https?:\/(\/.)+).*/g) === 0 || t === "" ? true : "Urls only allowed",
+                message: "Insert endpoint: "
+            })
+                .then(response =>
+                    (response.value as string)
+                        .replace('/chat/completions', '')
+                )
+                .then(value => /(https?:\/(\/.)+).*/g.test(value) ? value : undefined)
+                .then(saveCustomUrl)
+        }
+    )
 
 commander.parse(process.argv);

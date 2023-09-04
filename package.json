@@ -1,15 +1,16 @@
 {
   "name": "terminalgpt",
-  "version": "1.6.4",
-  "main": "index.ts",
+  "version": "1.6.9",
+  "main": "lib/index.js",
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {
-    "tgpt": "ts-node src/index.ts",
+    "tgpt": "node lib/index.js",
     "test": "jest --ci --coverage --verbose",
     "dev": "ts-node src/index.ts chat --engine gpt-4 --temperature 0.7",
     "dev:markdown": "ts-node src/index.js chat --engine gpt-4 --temperature 0.7 --markdown",
     "tunne": "ts-node src/index.js chat --engine gpt-4 --temperature 0.7 --finetunning true --limit 1",
-    "dev:delete": "ts-node src/index.js delete"
+    "dev:delete": "ts-node src/index.js delete",
+    "postinstall": "tsc"
   },
   "homepage": "https://github.com/jucasoliveira/terminalGPT#readme",
   "repository": {
@@ -23,7 +24,7 @@
     "url": "https://github.com/jucasoliveira/terminalGPT/issues"
   },
   "bin": {
-    "tgpt": "src/index.ts"
+    "tgpt": "lib/index.js"
   },
   "jest": {
     "transform": {
@@ -35,7 +36,6 @@
     "clipboardy": "2.3.0",
     "commander": "^9.5.0",
     "compromise": "^14.8.1",
-    "crypto": "^1.0.1",
     "gradient-string": "^2.0.2",
     "lowdb": "^5.1.0",
     "markdown": "^0.5.0",
@@ -44,19 +44,20 @@
     "openai": "^3.2.0",
     "ora": "^5.4.1",
     "prompts": "^2.4.2",
-    "typesync": "^0.11.1"
+    "typesync": "^0.11.1",
+    "@types/node": "^16.0.0",
+    "@types/prompts": "^2.0.10",
+    "@types/gradient-string": "^1.1.2",
+    "@types/marked": "^4.3.1",
+    "@types/marked-terminal": "^3.1.3"
   },
   "devDependencies": {
     "@types/chai": "^4.3.5",
     "@types/chalk": "^2.2.0",
     "@types/clipboardy": "2.0.1",
     "@types/eslint": "^8.44.2",
-    "@types/gradient-string": "^1.1.2",
     "@types/jest": "^29.5.4",
-    "@types/marked": "^4.3.1",
-    "@types/marked-terminal": "^3.1.3",
     "@types/ora": "^3.2.0",
-    "@types/prompts": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
     "chai": "^4.3.7",

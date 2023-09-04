@@ -1,6 +1,6 @@
 {
   "name": "terminalgpt",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "main": "lib/index.js",
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {
@@ -56,6 +56,7 @@
     "@types/jest": "^29.5.4",
     "@types/marked": "^4.3.1",
     "@types/marked-terminal": "^3.1.3",
+    "@types/node": "^20.5.9",
     "@types/ora": "^3.2.0",
     "@types/prompts": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^6.4.1",

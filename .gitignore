@@ -110,3 +110,4 @@ dist
 *.txt
 *.jsonl
 .yarn
+lib

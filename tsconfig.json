@@ -9,12 +9,13 @@
     "strict": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
-    "outDir": "./out"
+    "outDir": "./lib"
   },
   "include": [
     "src/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "lib"
   ]
 }

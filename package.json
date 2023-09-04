@@ -1,15 +1,16 @@
 {
   "name": "terminalgpt",
-  "version": "1.6.4",
-  "main": "index.ts",
+  "version": "1.6.5",
+  "main": "lib/index.js",
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {
-    "tgpt": "ts-node src/index.ts",
+    "tgpt": "node lib/index.js",
     "test": "jest --ci --coverage --verbose",
     "dev": "ts-node src/index.ts chat --engine gpt-4 --temperature 0.7",
     "dev:markdown": "ts-node src/index.js chat --engine gpt-4 --temperature 0.7 --markdown",
     "tunne": "ts-node src/index.js chat --engine gpt-4 --temperature 0.7 --finetunning true --limit 1",
-    "dev:delete": "ts-node src/index.js delete"
+    "dev:delete": "ts-node src/index.js delete",
+    "postinstall": "tsc"
   },
   "homepage": "https://github.com/jucasoliveira/terminalGPT#readme",
   "repository": {

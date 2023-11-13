@@ -1,13 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 //const fs = require("fs");
 
 //const contextFile = `${__dirname}/../data/context-terminal-gpt.txt`;
 
-import {ChatCompletionRequestMessage} from "openai";
+let context: any[] = [];
 
-let context: ChatCompletionRequestMessage[] = [];
-
-export function addContext(text: ChatCompletionRequestMessage) {
-    context = [...context, text];
+export function addContext(text: any) {
+  context = [...context, text];
 }
 
-export const getContext = () => context
+export const getContext = () => context;

@@ -106,3 +106,7 @@ Refer to CONTRIBUTING.md 😎
 <a href="https://github.com/jucasoliveira/terminalGPT/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=jucasoliveira/terminalGPT" />
 </a>
+
+## Stats
+
+![Alt](https://repobeats.axiom.co/api/embed/92b8c74cac77f3fbb0e843cc3f6a36b01e7bd152.svg "Repobeats analytics image")

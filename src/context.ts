@@ -5,6 +5,11 @@
 
 let context: any[] = [];
 
+/**
+ * Adds a new context to the existing context array.
+ *
+ * @param {any} text - The text to be added to the context array.
+ */
 export function addContext(text: any) {
   context = [...context, text];
 }

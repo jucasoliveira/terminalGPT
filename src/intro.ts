@@ -2,6 +2,11 @@ import chalk from "chalk";
 
 import gradient from "gradient-string";
 
+/**
+ * Generates the function comment for the given function body.
+ *
+ * @return {void} No return value.
+ */
 export default function intro() {
   const asciiArt = `
   ********************************************************************

@@ -17,6 +17,11 @@ marked.setOptions({
   renderer: new TerminalRenderer(),
 });
 
+/**
+ * Prompts the user for an API key and returns it.
+ *
+ * @return {string} The API key entered by the user.
+ */
 export async function apiKeyPrompt() {
   let apiKey = getApiKey();
 
@@ -37,6 +42,12 @@ export async function apiKeyPrompt() {
   return apiKey;
 }
 
+/**
+ * Checks a block of code for matches and prompts the user to copy the code to the clipboard.
+ *
+ * @param {string} text - The text to search for matches within ``` code blocks.
+ * @return {void} This function does not return a value.
+ */
 async function checkBlockOfCode(text: string) {
   // get all matches of text within ```
   const regex = /```[\s\S]*?```/g;
@@ -56,6 +67,15 @@ async function checkBlockOfCode(text: string) {
   }
 }
 
+/**
+ * Generates a response based on the given API key, prompt, response, and options.
+ *
+ * @param {string} apiKey - The API key to authenticate the request.
+ * @param {() => void} prompt - The function to prompt the user.
+ * @param {prompts.Answers<string>} response - The user's response.
+ * @param {{ engine: string; temperature: unknown; markdown?: unknown; }} opts - The options for generating the response.
+ * @return {Promise<void>} A promise that resolves when the response is generated.
+ */
 export async function generateResponse(
   apiKey: string,
   prompt: () => void,

@@ -32,6 +32,7 @@ export default async (
       temperature: opts.temperature ? Number(opts.temperature) : 1,
     })
     .then((res) => {
+      console.log("here");
       if (typeof res.choices[0].message !== "undefined") {
         addContext(res.choices[0].message);
         spinner.stop();
@@ -41,6 +42,7 @@ export default async (
       }
     })
     .catch((err) => {
+      console.log(err);
       spinner.stop();
       switch (err["response"]["status"]) {
         case 404:

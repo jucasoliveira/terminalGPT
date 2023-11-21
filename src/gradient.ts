@@ -29,6 +29,11 @@ const referenceGradient: string[] = [
   ...gradientColors,
 ];
 
+/**
+ * Generates the frames for a gradient animation.
+ *
+ * @return {string[]} An array of strings representing the frames of the animation.
+ */
 export function getGradientAnimFrames() {
   const frames: string[] = [];
   for (let start = 0; start < gradientColors.length * 2; start++) {

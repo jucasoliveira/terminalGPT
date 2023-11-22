@@ -15,12 +15,23 @@
 Get GPT-like chatGPT on your terminal
 </p>
 
-![Screenshot 2023-11-22 at 16 54 10](https://github.com/jucasoliveira/terminalGPT/assets/11979969/3de20615-87ad-4157-99ad-33ba2687214b)
+<p align="center">
+   <img alt="TerminalGPT logo" src="https://github.com/jucasoliveira/terminalGPT/assets/11979969/3de20615-87ad-4157-99ad-33ba2687214b"/>
+</p>
+
 
 <p align="center">
 <a href="https://www.producthunt.com/posts/terminalgpt?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-terminalgpt" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=373888&theme=light" alt="terminalGPT - Use&#0032;OpenAi&#0032;like&#0032;chatGPT&#0044;&#0032;on&#0032;your&#0032;terminal | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-
 </p>
+
+## Stats
+
+<p align="center">
+   <img alt="TerminalGPT logo" src="https://repobeats.axiom.co/api/embed/92b8c74cac77f3fbb0e843cc3f6a36b01e7bd152.svg"/>
+</p>
+
+
+
 
 ## Prerequisites
 
@@ -107,7 +118,3 @@ Refer to CONTRIBUTING.md 😎
 <a href="https://github.com/jucasoliveira/terminalGPT/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=jucasoliveira/terminalGPT" />
 </a>
-
-## Stats
-
-![Alt](https://repobeats.axiom.co/api/embed/92b8c74cac77f3fbb0e843cc3f6a36b01e7bd152.svg "Repobeats analytics image")

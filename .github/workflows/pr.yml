@@ -1,0 +1,24 @@
+name: Pull Request Test
+
+on:
+  pull_request_target:
+    branches:
+      - main
+
+jobs:
+  test_coverage:
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ArtiomTr/jest-coverage-report-action@v2
+        id: coverage
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          output: report-markdown
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: ${{ steps.coverage.outputs.report }}

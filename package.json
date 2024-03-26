@@ -1,0 +1,70 @@
+{
+  "name": "terminalgpt",
+  "version": "1.7.4",
+  "main": "lib/index.js",
+  "description": "Get GPT like chatGPT on your terminal",
+  "scripts": {
+    "tgpt": "node lib/index.js",
+    "test": "jest --ci --coverage --verbose",
+    "dev": "ts-node src/index.ts chat --engine gpt-4 --temperature 0.7",
+    "dev:markdown": "ts-node src/index.ts chat --engine gpt-4 --temperature 0.7 --markdown",
+    "tunne": "ts-node src/index.ts chat --engine gpt-4 --temperature 0.7 --finetunning true --limit 1",
+    "dev:delete": "ts-node src/index.ts delete",
+    "postinstall": "tsc"
+  },
+  "homepage": "https://github.com/jucasoliveira/terminalGPT#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jucasoliveira/terminalGPT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jucasoliveira/terminalGPT/issues"
+  },
+  "bin": {
+    "tgpt": "lib/index.js"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    }
+  },
+  "dependencies": {
+    "@types/gradient-string": "^1.1.5",
+    "@types/marked": "^6.0.0",
+    "@types/marked-terminal": "^6.0.1",
+    "@types/node": "^16.0.0",
+    "@types/prompts": "^2.4.8",
+    "chalk": "^4.1.2",
+    "clipboardy": "2.3.0",
+    "commander": "^9.5.0",
+    "compromise": "^14.8.1",
+    "gradient-string": "^2.0.2",
+    "lowdb": "^5.1.0",
+    "markdown": "^0.5.0",
+    "marked": "^9.1.6",
+    "marked-terminal": "^6.0.0",
+    "openai": "^4.17.4",
+    "ora": "^5.4.1",
+    "prompts": "^2.4.2",
+    "typesync": "^0.11.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.5",
+    "@types/chalk": "^2.2.0",
+    "@types/clipboardy": "2.0.1",
+    "@types/eslint": "^8.44.2",
+    "@types/jest": "^29.5.4",
+    "@types/ora": "^3.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "chai": "^4.3.7",
+    "eslint": "^8.47.0",
+    "jest": "^29.6.4",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  }
+}

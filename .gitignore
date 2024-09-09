@@ -111,3 +111,5 @@ dist
 *.jsonl
 .yarn
 lib
+
+credentials.json

@@ -1,0 +1,15 @@
+// .vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}/vscode-plugin"],
+      "outFiles": ["${workspaceFolder}/vscode-plugin/out/**/*.js"],
+      "preLaunchTask": "npm: compile"
+    }
+  ]
+}

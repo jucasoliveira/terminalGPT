@@ -55,7 +55,7 @@ export async function apiKeyPrompt() {
   if (!apiKey || !engine) {
     const response = await prompts(questions);
     // Save both API key and engine
-    saveCredentials(encrypt(response.apiKey), response.engine, "user");
+    saveCredentials(encrypt(response.apiKey), response.engine);
     return { apiKey: response.apiKey, engine: response.engine };
   }
 

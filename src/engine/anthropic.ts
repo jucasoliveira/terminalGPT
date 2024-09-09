@@ -15,12 +15,12 @@ export const AnthropicEngine = async (
   }
 ) => {
   const apiKeyValue = await apiKey;
+
   const anthropic = new AnthropicClient({ apiKey: apiKeyValue });
   const spinner = loadWithRocketGradient("Thinking...").start();
 
   try {
     const relevantContext = getContext(prompt);
-    console.log("Relevant context:", relevantContext); // Debug log
 
     let messages: ContextItem[] = [];
     let systemMessage = "";
@@ -45,8 +45,6 @@ export const AnthropicEngine = async (
         messages.push({ role: "user", content: prompt });
       }
     }
-
-    console.log("Final messages:", messages); // Debug log
 
     const requestParams: MessageCreateParamsNonStreaming = {
       model: opts.model || "claude-3-opus-20240229",

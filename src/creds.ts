@@ -1,9 +1,31 @@
 import * as fs from "fs";
-
 import * as crypto from "crypto";
+import * as path from "path";
 
 const algorithm = "aes-256-cbc";
-const secretKey = "terminalGPT";
+const secretKeyFile = path.join(__dirname, "secret_key.txt");
+
+// Function to generate and save a secret key
+function generateAndSaveSecretKey(): string {
+  const secretKey = crypto.randomBytes(32).toString("hex");
+  fs.writeFileSync(secretKeyFile, secretKey, "utf8");
+  return secretKey;
+}
+
+// Function to get or create the secret key
+function getSecretKey(): string {
+  if (fs.existsSync(secretKeyFile)) {
+    return fs.readFileSync(secretKeyFile, "utf8");
+  } else {
+    return generateAndSaveSecretKey();
+  }
+}
+
+const secretKey = getSecretKey();
+
+function isEncrypted(text: string): boolean {
+  return text.includes(":") && /^[0-9a-f]+:[0-9a-f]+$/.test(text);
+}
 
 /**
  * Encrypts the given text using the specified algorithm, secret key, and initialization vector.
@@ -11,14 +33,16 @@ const secretKey = "terminalGPT";
  * @param {string} text - The text to be encrypted.
  * @return {string} The encrypted text in the format: IV:encryptedText.
  */
-export function encrypt(text: string) {
+export function encrypt(text: string): string {
+  if (isEncrypted(text)) {
+    return text;
+  }
   const iv = crypto.randomBytes(16);
   const key = crypto.scryptSync(secretKey, "salt", 32);
   const cipher = crypto.createCipheriv(algorithm, key, iv);
-  let encrypted = cipher.update(text);
-
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return iv.toString("hex") + ":" + encrypted.toString("hex");
+  let encrypted = cipher.update(text, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return iv.toString("hex") + ":" + encrypted;
 }
 
 /**
@@ -27,15 +51,33 @@ export function encrypt(text: string) {
  * @param {string} text - The text to be decrypted.
  * @return {string} - The decrypted text.
  */
-export function decrypt(text: string) {
-  const textParts = text.split(":");
-  const iv = Buffer.from(textParts.shift()!, "hex");
-  const encryptedText = Buffer.from(textParts.join(":"), "hex");
-  const key = crypto.scryptSync(secretKey, "salt", 32);
-  const decipher = crypto.createDecipheriv(algorithm, key, iv);
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
+export function decrypt(text: string | undefined): string | null {
+  if (!text) {
+    return null;
+  }
+
+  if (!isEncrypted(text)) {
+    return text;
+  }
+
+  const [ivHex, encryptedHex] = text.split(":");
+  if (!ivHex || !encryptedHex) {
+    return null;
+  }
+
+  try {
+    const iv = Buffer.from(ivHex, "hex");
+    const encrypted = Buffer.from(encryptedHex, "hex");
+    const key = crypto.scryptSync(secretKey, "salt", 32);
+    const decipher = crypto.createDecipheriv(algorithm, key, iv);
+    let decrypted = decipher.update(encrypted);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    const result = decrypted.toString("utf8");
+    return result;
+  } catch (error) {
+    console.error("Decryption error:", error);
+    return null;
+  }
 }
 
 /**
@@ -61,13 +103,18 @@ export function getEngine(): string | null {
 export function saveCredentials(
   apiKey: string,
   engine: string,
-  tavilyApiKey: string
+  tavilyApiKey?: string
 ) {
-  const credentials = { apiKey: encrypt(apiKey), engine, tavilyApiKey };
+  const credentials = {
+    apiKey: encrypt(apiKey),
+    engine,
+    tavilyApiKey: tavilyApiKey ? encrypt(tavilyApiKey) : undefined,
+  };
   fs.writeFileSync(
     `${__dirname}/credentials.json`,
-    JSON.stringify(credentials)
+    JSON.stringify(credentials, null, 2)
   );
+  console.log("Credentials saved successfully");
 }
 
 /**
@@ -81,14 +128,20 @@ export function getCredentials(): {
   tavilyApiKey: string | null;
 } {
   if (fs.existsSync(`${__dirname}/credentials.json`)) {
-    const data = fs.readFileSync(`${__dirname}/credentials.json`, "utf8");
-    const { apiKey, engine, tavilyApiKey } = JSON.parse(data);
-    return {
-      apiKey: apiKey ? decrypt(apiKey) : null,
-      engine,
-      tavilyApiKey: tavilyApiKey || null,
-    };
+    try {
+      const data = fs.readFileSync(`${__dirname}/credentials.json`, "utf8");
+      const { apiKey, engine, tavilyApiKey } = JSON.parse(data);
+      return {
+        apiKey: apiKey ? decrypt(apiKey) : null,
+        engine: engine || null,
+        tavilyApiKey: tavilyApiKey ? decrypt(tavilyApiKey) : null,
+      };
+    } catch (error) {
+      console.error("Error reading or parsing credentials:", error);
+      return { apiKey: null, engine: null, tavilyApiKey: null };
+    }
   }
+  console.log("Credentials file not found");
   return { apiKey: null, engine: null, tavilyApiKey: null };
 }
 

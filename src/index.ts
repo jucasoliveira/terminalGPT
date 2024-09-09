@@ -1,109 +1,72 @@
 #!/usr/bin/env node
 
 import chalk from "chalk";
-import process from "process";
-import prompts from "prompts";
-
+import * as process from "process";
+import { Command } from "commander";
 import intro from "./intro";
+import { apiKeyPrompt, promptResponse } from "./utils";
+import { deleteCredentials } from "./creds";
+import readline from "readline";
+import { mapPlugins, initializePlugins } from "./commands";
 
-import { apiKeyPrompt, generateResponse } from "./utils";
+const program = new Command();
 
-import { deleteApiKey, saveCustomUrl } from "./encrypt";
-
-import * as c from "commander";
-
-const commander = new c.Command();
-commander
+program
   .command("chat")
-  .option("-e, --engine <engine>", "GPT model to use")
+  .option("-e, --engine <engine>", "LLM to use")
   .option("-t, --temperature <temperature>", "Response temperature")
-  .option("-m, --markdown", "Show markdown in the terminal")
   .usage(`"<project-directory>" [options]`)
   .action(async (opts) => {
     intro();
-    apiKeyPrompt().then((apiKey: string | null) => {
-      const prompt = async () => {
-        const response = await prompts({
-          type: "text",
-          name: "value",
-          message: `${chalk.blueBright("You: ")}`,
-          validate: () => {
-            return true;
-          },
-          onState: (state) => {
-            if (state.aborted) {
-              process.exit(0);
-            }
-          },
-        });
+    const creds = await apiKeyPrompt();
 
-        switch (response.value) {
-          case "exit":
-            return process.exit(0);
-          case "clear":
-            return process.stdout.write("\x1Bc");
-          default:
-            if (apiKey != null) {
-              generateResponse(apiKey, prompt, response, opts);
-            }
-            return;
+    // Initialize plugins
+    initializePlugins();
+
+    const prompt = () => {
+      process.stdout.write(chalk.blueBright("\nYou: "));
+      process.stdin.resume();
+      process.stdin.setEncoding("utf-8");
+      process.stdin.once("data", async (data) => {
+        const userInput = data.toString().trim();
+
+        const plugin = mapPlugins(userInput);
+        if (plugin) {
+          await plugin.execute(userInput);
+        } else if (creds.apiKey != null) {
+          await promptResponse(creds.engine, creds.apiKey, userInput, opts);
         }
-      };
-      prompt();
-    });
+
+        prompt();
+      });
+    };
+
+    prompt();
   });
 
-// create commander to delete api key
-commander
+program
   .command("delete")
   .description("Delete your API key")
   .action(async () => {
-    const response = await prompts({
-      type: "select",
-      name: "value",
-      message: "Are you sure?",
-      choices: [
-        { title: "Yes", value: "yes" },
-        { title: "No - exit", value: "no" },
-      ],
-      initial: 0,
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
     });
 
-    if (response.value === "yes") {
-      const apiKeyDeleted = deleteApiKey();
-      if (apiKeyDeleted) {
-        console.log("API key deleted");
+    rl.question("Are you sure? (yes/no): ", (answer) => {
+      if (answer.toLowerCase() === "yes") {
+        const apiKeyDeleted = deleteCredentials();
+        if (apiKeyDeleted) {
+          console.log("API key deleted");
+        } else {
+          console.log("API key file not found, no action taken.");
+        }
       } else {
-        console.log("API key file not found, no action taken.");
+        console.log("Deletion cancelled");
       }
-      return process.exit(0);
-    } else {
-      console.log("Deletion cancelled");
-      return process.exit(0);
-    }
+      rl.close();
+      process.exit(0);
+    });
   });
 
-commander
-  .command("endpoint")
-  .option("--set <url>", "Set your custom endpoint")
-  .option("-r, --reset", "Reset the API endpoint to default ")
-  .description("Configure your API endpoint")
-  .action(async () => {
-    console.log("Send empty to set default openai endpoint");
-    prompts({
-      type: "text",
-      name: "value",
-      validate: (t) =>
-        t.search(/(https?:\/(\/.)+).*/g) === 0 || t === ""
-          ? true
-          : "Urls only allowed",
-      message: "Insert endpoint: ",
-    })
-      .then((response) =>
-        (response.value as string).replace("/chat/completions", "")
-      )
-      .then((value) => (/(https?:\/(\/.)+).*/g.test(value) ? value : undefined))
-      .then(saveCustomUrl);
-  });
-
-commander.parse(process.argv);
+program.parse(process.argv);

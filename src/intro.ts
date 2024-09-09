@@ -63,11 +63,19 @@ export default function intro() {
 
     To exit, type "${chalk.redBright("exit")}" and press enter.
 
-    # Commands
+    # Program commands
     ${chalk.yellowBright("exit")} - Exit the program
     ${chalk.yellowBright("delete")} - Delete the saved API key
     ${chalk.yellowBright("chat")} - Start a chat
-    ${chalk.yellowBright("--markdown")} - Show the response in markdown
+    
+    # Chat commands
+    ${chalk.yellowBright("clear")} - Clear the terminal
+    ${chalk.yellowBright("help")} - Show help
+    ${chalk.yellowBright("credits")} - Show credits
+    ${chalk.yellowBright("feedback")} - Provide feedback
+    ${chalk.yellowBright("contribute")} - Contribute to TerminalGPT
+    ${chalk.yellowBright("@web")} - Search the web
+    ${chalk.yellowBright("@file")} - Read a file
 
 
   `;

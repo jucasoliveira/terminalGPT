@@ -28,8 +28,10 @@ describe("Encryption and Decryption", () => {
     expect(decrypted).to.equal("test");
   });
 
-  it("should throw an error when given an invalid encrypted string", () => {
-    expect(() => decrypt("invalid:string")).to.throw();
+  it("should handle invalid encrypted strings correctly", () => {
+    expect(decrypt("invalid:string")).to.equal("invalid:string");
+    expect(decrypt("invalidstring")).to.equal("invalidstring");
+    expect(decrypt("")).to.be.null;
   });
 });
 

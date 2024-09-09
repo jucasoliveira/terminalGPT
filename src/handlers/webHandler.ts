@@ -2,29 +2,27 @@
 import axios from "axios";
 import { addContext } from "../context";
 import chalk from "chalk";
-import { getCredentials, saveCredentials, encrypt, decrypt } from "../creds";
+import { saveCredentials, getCredentials } from "../creds";
 import readline from "readline";
 
 export async function handleWebResearch(query: string, userPrompt: string) {
   try {
-    let credentials = getCredentials();
+    let credentials = await getCredentials();
 
     if (!credentials.tavilyApiKey) {
       console.log(chalk.yellow("Tavily API key not found."));
       console.log(
         chalk.cyan("Please visit https://tavily.com to get an API key.")
       );
-      const apiKey = await promptForApiKey();
-      const encryptedTavilyApiKey = encrypt(apiKey);
+      const tavilyApiKey = await promptForApiKey();
       saveCredentials(
         credentials.apiKey || "",
         credentials.engine || "",
-        encryptedTavilyApiKey
+        tavilyApiKey
       );
       credentials = getCredentials();
     }
-
-    const tavilyApiKey = decrypt(credentials.tavilyApiKey!);
+    const tavilyApiKey = credentials.tavilyApiKey!;
 
     console.log(chalk.yellow(`Searching the web for: "${query}"...`));
 
@@ -38,7 +36,7 @@ export async function handleWebResearch(query: string, userPrompt: string) {
     const searchResults = response.data.results
       .map(
         (result: any) =>
-          `Title: ${result.title}\nSnippet: ${result.snippet}\n\n`
+          `Title: ${result.title}\nSnippet: ${result.content}\n\n`
       )
       .join("");
 
@@ -57,6 +55,7 @@ export async function handleWebResearch(query: string, userPrompt: string) {
   }
 }
 
+// Update the promptForApiKey function
 async function promptForApiKey(): Promise<string> {
   const rl = readline.createInterface({
     input: process.stdin,
@@ -66,7 +65,8 @@ async function promptForApiKey(): Promise<string> {
   return new Promise((resolve) => {
     rl.question("Please enter your Tavily API key: ", (apiKey) => {
       rl.close();
-      resolve(encrypt(apiKey.trim()));
+      // Remove encryption here
+      resolve(apiKey.trim());
     });
   });
 }

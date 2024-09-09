@@ -2,28 +2,35 @@ import * as path from "path";
 
 import fs from "fs";
 
-import {expect} from "chai";
+import { expect } from "chai";
 
+import { apiKeyPrompt /*, generateResponse*/ } from "../src/utils";
 
-import {apiKeyPrompt/*, generateResponse*/} from "../src/utils";
-
-import {encrypt} from "../src/encrypt";
-
+import { encrypt } from "../src/creds";
 
 describe("apiKeyPrompt()", () => {
-    const apiKeyPath = path.resolve(__dirname, "../src/apiKey.txt");
+  const credentialsPath = path.resolve(__dirname, "../src/credentials.json");
 
-    beforeEach(() => {
-        if (!fs.existsSync(apiKeyPath)) {
-            fs.writeFileSync(apiKeyPath, encrypt("test"));
-        }
-    });
+  beforeEach(() => {
+    if (!fs.existsSync(credentialsPath)) {
+      fs.writeFileSync(
+        credentialsPath,
+        JSON.stringify({
+          apiKey: encrypt("test"),
+          engine: "test",
+          tavilyApiKey: encrypt("test"),
+        })
+      );
+    }
+  });
 
-    it("the api key prompt to user should return a string", async () => {
-        const result = await apiKeyPrompt()
-        expect(result).to.be.a("string")
-    })
-})
+  it("the api key prompt to user should return an object with apiKey and engine", async () => {
+    const result = await apiKeyPrompt();
+    expect(result).to.be.an("object");
+    expect(result).to.have.property("apiKey");
+    expect(result).to.have.property("engine");
+  });
+});
 
 // FIXME cannot be executed without a real api key
 // describe("generateResponse()", () => {
@@ -66,25 +73,25 @@ describe("apiKeyPrompt()", () => {
 //         });
 //     });
 
-    // it("Should create a instance of Configuration", async () => {
-    //     const
-    //         apiKey = "abx",
-    //         prompt = jest.fn(),
-    //         options = {},
-    //         response = {
-    //             data: {
-    //                 choices: ["abc", "def"],
-    //             },
-    //         }
-    //
-    //     const getResponse = await generateResponse(
-    //         apiKey,
-    //         prompt,
-    //         options,
-    //         response
-    //     )
-    //
-    //     // expect(getResponse).throw(Error)
-    //     expect(getResponse).to.be.a("string");
-    // });
+// it("Should create a instance of Configuration", async () => {
+//     const
+//         apiKey = "abx",
+//         prompt = jest.fn(),
+//         options = {},
+//         response = {
+//             data: {
+//                 choices: ["abc", "def"],
+//             },
+//         }
+//
+//     const getResponse = await generateResponse(
+//         apiKey,
+//         prompt,
+//         options,
+//         response
+//     )
+//
+//     // expect(getResponse).throw(Error)
+//     expect(getResponse).to.be.a("string");
+// });
 // });

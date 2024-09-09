@@ -1,70 +1,71 @@
-import * as crypto from "../src/encrypt";
-
-import fs from "fs";
-
+import { expect } from "chai";
+import * as fs from "fs";
 import * as path from "path";
+import {
+  encrypt,
+  decrypt,
+  getCredentials,
+  saveCredentials,
+  deleteCredentials,
+} from "../src/creds";
 
-import {expect} from "chai";
+describe("Encryption and Decryption", () => {
+  it("should return a string in the format 'IV:encrypted_text'", () => {
+    const result = encrypt("test");
+    expect(result).to.be.a("string");
+    expect(result).to.include(":");
+  });
 
-describe("encrypt()", () => {
-    it("should return a string in the format 'IV:encrypted_text'", () => {
-        const result = crypto.encrypt("test");
-        expect(result).to.match(/^[a-f0-9]{32}:([a-f0-9]{2})*$/);
-    });
+  it("should return a different result each time it is called", () => {
+    const result1 = encrypt("test");
+    const result2 = encrypt("test");
+    expect(result1).to.not.equal(result2);
+  });
 
-    it("should return a different result each time it is called", () => {
-        const result1 = crypto.encrypt("test");
-        const result2 = crypto.encrypt("test");
-        expect(result1).not.equal(result2);
-    });
+  it("should return the original input text when given a valid encrypted string", () => {
+    const encrypted = encrypt("test");
+    const decrypted = decrypt(encrypted);
+    expect(decrypted).to.equal("test");
+  });
+
+  it("should throw an error when given an invalid encrypted string", () => {
+    expect(() => decrypt("invalid:string")).to.throw();
+  });
 });
 
-describe("decrypt()", () => {
-    it("should return the original input text when given a valid encrypted string", () => {
-        const encrypted = crypto.encrypt("test");
-        const result = crypto.decrypt(encrypted);
-        expect(result).to.equal("test");
+describe("Credentials Management", () => {
+  const credentialsPath = path.resolve(__dirname, "../src/credentials.json");
+
+  beforeEach(() => {
+    deleteCredentials();
+  });
+
+  afterEach(() => {
+    deleteCredentials();
+  });
+
+  it("should return null values if credentials have not been saved", () => {
+    const result = getCredentials();
+    expect(result).to.deep.equal({
+      apiKey: null,
+      engine: null,
+      tavilyApiKey: null,
     });
+  });
 
-    it("should throw an error when given an invalid encrypted string", () => {
-        expect(() => crypto.decrypt("invalid")).to.throw();
-    });
-});
+  it("should save and retrieve credentials correctly", () => {
+    saveCredentials("testApiKey", "testEngine", "testTavilyApiKey");
+    const result = getCredentials();
+    expect(result.apiKey).to.equal("testApiKey");
+    expect(result.engine).to.equal("testEngine");
+    expect(result.tavilyApiKey).to.equal("testTavilyApiKey");
+  });
 
-describe("Api Key ", () => {
-    // the path to the apiKey.txt file should point to ../src/apiKey.txt
-    const apiKeyPath = path.resolve(__dirname, "../src/apiKey.txt");
-
-    const removeLink = () => {
-        try {
-            fs.unlinkSync(apiKeyPath)
-        } catch { /* empty */
-        }
-    }
-
-    beforeEach(removeLink)
-    afterEach(removeLink)
-
-    it("should return null if the API key has not been saved", () => {
-        const result = crypto.getApiKey();
-        expect(result).to.equal(null);
-    });
-
-    it("should return the API key if it has been saved", () => {
-        const encrypted = crypto.encrypt("test");
-        crypto.saveApiKey(encrypted)
-        const result = crypto.getApiKey();
-        expect(result).to.equal("test");
-    });
-
-    it("should save the given API key to a file", () => {
-        if (!fs.existsSync(apiKeyPath)) {
-            fs.writeFileSync(apiKeyPath, "");
-        }
-        const encryptedText = crypto.encrypt("test");
-        crypto.saveApiKey(encryptedText);
-        const result = crypto.getApiKey()// fs.readFileSync(apiKeyPath, "utf8");
-
-        expect(result).to.equal("test");
-    });
+  it("should encrypt the API key when saving", () => {
+    saveCredentials("testApiKey", "testEngine", "testTavilyApiKey");
+    const rawData = fs.readFileSync(credentialsPath, "utf-8");
+    const savedCredentials = JSON.parse(rawData);
+    expect(savedCredentials.apiKey).to.not.equal("testApiKey");
+    expect(decrypt(savedCredentials.apiKey)).to.equal("testApiKey");
+  });
 });

@@ -7,43 +7,40 @@ import gradient from "gradient-string";
  *
  * @return {void} No return value.
  */
-export default function intro() {
+export default async function intro() {
   const asciiArt = `
-  ********************************************************************
-  ********************************************************************
-  ********************************************************************
-  **                ,----------------,              ,---------,     **
-  **           ,-----------------------,          ,"        ,"|     **
-  **         ,"                      ,"|        ,"        ,"  |     **
-  **        +-----------------------+  |      ,"        ,"    |     **
-  **        |  .-----------------.  |  |     +---------+      |     **
-  **        |  |                 |  |  |     | -==----'|      |     **
-  **        |  |  W a r p y .    |  |  |     |         |      |     **
-  **        |  |  TerminalGPT    |  |  |/----|'---=    |      |     **
-  **        |  |  tgpt:>_        |  |  |   ,/|==== ooo |      ;     **
-  **        |  |                 |  |  |  // |(((( [33]|    ,"      **
-  **        |  '-----------------'  |,' .;'| |((((     |  ,"        **
-  **        +-----------------------+  ;;  | |         |,"          **
-  **            /_)______________(_/  //'  | +---------+            **
-  **    ___________________________/___  ,                          **
-  **    /  oooooooooooooooo  .o.  oooo /,   ,'----------- ,'        **
-  **    / ==ooooooooooooooo==.o.  ooo= //   ,'-{)B     ,'           **
-  **    /_==__==========__==_ooo__ooo=_/'   /___________,'          **
-  **    '-----------------------------'                             **
-  ********************************************************************
-  ********************************************************************
-  ********************************************************************`;
+                                          
+                                                                                
+                                     ddiiidd                                    
+                                 6diiiiiiiiiiid0                                
+                             dddiiiiiiiiiiiiiiiiidd0                            
+                          ddiiiiiiiidiiiiiiiidiiiiiiid0                         
+                      ddiiiiiiiiiiiiiidiiiiiiiiiiiiiiiiiidd                     
+                     0ddiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiid                    
+                     00000ddiiiiiiiiiiiiiiiiiiiiiiiiiidiiiid                    
+                     0d0000000diiiiiiiiiiiiiiiiiiidddiiiiiid                    
+                     0d0000000000ddiiiidiiiiiiddddiiididiidd                    
+                     0000000000000000ddiiiiddddiddddiiiiiiid                    
+                     0d00000000000000000ddddddiddiidiiiiiiid                    
+                     0d00000000000000000ddddddidddididiiiiid                    
+                     0000000000000000000dddddddiiddiiiidiiid                    
+                     0000000000000000000dddddddddiddiiiiiiid                    
+                     0d00000000000000000dddddiiddiididiiiidd                    
+                     0d00000000000000000dddddddiddidiiidiiid                    
+                     0000000000000000000dddddddiddidiiiiiiid                    
+                      000000000000000000ddddddiddiddiddiidd                     
+                         000000000000000dddddiddiddiiidd                        
+                           6000000000000dddddddiddidd                           
+                               000000000dddddddid0                              
+                                  000000ddddddd                                 
+                                     000dddd                                    
+ `;
 
   const coloredAscii = gradient("magenta", "cyan").multiline(asciiArt);
   const usageText = `
-  ${gradient(
-    "cyan",
-    "pink"
-  )("********************")} Welcome to ${chalk.greenBright(
-    "TerminalGPT"
-  )} ${gradient("cyan", "pink")("************************")}
+ 
   ${coloredAscii}
-
+  Welcome to ${chalk.greenBright("TerminalGPT")} 
   ${chalk.cyanBright(
     "Created by @jucasoliveira: https://github.com/jucasoliveira"
   )}

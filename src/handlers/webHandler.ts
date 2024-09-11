@@ -36,7 +36,7 @@ export async function handleWebResearch(query: string, userPrompt: string) {
     const searchResults = response.data.results
       .map(
         (result: any) =>
-          `Title: ${result.title}\nSnippet: ${result.content}\n\n`
+          `Title: ${result.title}\nContent: ${result.content}\n\n`
       )
       .join("");
 
@@ -49,6 +49,7 @@ export async function handleWebResearch(query: string, userPrompt: string) {
         `Web research results for "${query}" have been added to the conversation context.`
       )
     );
+    return webContext;
   } catch (error: any) {
     console.error(chalk.red(`Error performing web research: ${error.message}`));
   }

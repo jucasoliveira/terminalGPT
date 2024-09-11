@@ -3,7 +3,7 @@ import chalk from "chalk";
 import gradient from "gradient-string";
 
 /**
- * Generates the function comment for the given function body.
+ * Displays the introduction message for TerminalGPT.
  *
  * @return {void} No return value.
  */
@@ -19,7 +19,7 @@ export default function intro() {
   **        |  .-----------------.  |  |     +---------+      |     **
   **        |  |                 |  |  |     | -==----'|      |     **
   **        |  |  W a r p y .    |  |  |     |         |      |     **
-  **        |  |  Bad command or |  |  |/----|'---=    |      |     **
+  **        |  |  TerminalGPT    |  |  |/----|'---=    |      |     **
   **        |  |  tgpt:>_        |  |  |   ,/|==== ooo |      ;     **
   **        |  |                 |  |  |  // |(((( [33]|    ,"      **
   **        |  '-----------------'  |,' .;'| |((((     |  ,"        **
@@ -40,7 +40,7 @@ export default function intro() {
     "cyan",
     "pink"
   )("********************")} Welcome to ${chalk.greenBright(
-    "terminalGPT"
+    "TerminalGPT"
   )} ${gradient("cyan", "pink")("************************")}
   ${coloredAscii}
 
@@ -49,29 +49,34 @@ export default function intro() {
   )}
 
   ${chalk.cyanBright(
-    "TerminalGPT will be maintained by Warpi as Jan 2024. You can check other OS initiavies at:"
+    "TerminalGPT is maintained by Warpy as of Jan 2024. Check out other OS initiatives at:"
   )}
 
   ${chalk.blueBright("https://github.com/warpy-ai")}
 
 
-  ${chalk.yellowBright("usage:")}
-    TerminalGPT will ask you to add your OpenAI API key. Don't worry, it will be saved(encrypted) on your machine locally.
+  ${chalk.yellowBright("Usage:")}
+    TerminalGPT will ask for your API key. It will be encrypted and saved locally.
 
-    Terminal will prompt you to enter a message. Type your message and press enter.
-    Terminal will then prompt you to enter a response. Type your response and press enter.
+    Type your message and press enter. TerminalGPT will respond.
 
-    To exit, type "${chalk.redBright("exit")}" and press enter.
+    TerminalGPT is enhanced with plugins. To use a plugin, start your message with the plugin keyword (e.g., @web for web search).
+    Or you can start chatting and TerminalGPT will suggest plugins based on your message.
 
-    # Commands
-    ${chalk.yellowBright("exit")} - Exit the program
-    ${chalk.yellowBright("delete")} - Delete the saved API key
-    ${chalk.yellowBright("chat")} - Start a chat
-    ${chalk.yellowBright("--markdown")} - Show the response in markdown
+    ${chalk.yellowBright("Available Plugins:")}
+    ${chalk.cyanBright("@list")} - Lists all available plugins
 
+    ${chalk.yellowBright("Other Commands:")}
+    ${chalk.cyanBright("delete")} - Delete the saved API key
+    ${chalk.cyanBright("chat")} - Start a new chat session
+    ${chalk.cyanBright("--markdown")} - Display the response in markdown format
 
+    To exit, type "${chalk.redBright("exit")}" or use the ${chalk.cyanBright(
+    "@exit"
+  )} plugin.
+
+  ${chalk.greenBright("Start chatting or use a plugin to begin!")}
   `;
 
-  // eslint-disable-next-line no-undef
   console.log(usageText);
 }

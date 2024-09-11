@@ -11,7 +11,6 @@ import { marked } from "marked";
 
 import TerminalRenderer from "marked-terminal";
 
-import clipboard from "clipboardy";
 import { generateResponse } from "./engine/Engine";
 import { encrypt, getCredentials, saveCredentials } from "./creds";
 

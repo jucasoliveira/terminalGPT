@@ -20,53 +20,40 @@ export interface AiEngine {
   ): Promise<string | null | undefined>;
 }
 
-export class Engine implements AiEngine {
-  private engine: AiEngine;
-
-  constructor(engineType: string, public config: AiEngineConfig) {
-    this.engine = this.createEngine(engineType, config);
-  }
-
-  // Add this method
-  async engineResponse(
-    prompt: string,
-    options?: { temperature?: number }
-  ): Promise<string | null | undefined> {
-    return this.engine.engineResponse(prompt, options);
-  }
-
-  private createEngine(engineType: string, config: AiEngineConfig): AiEngine {
-    const engineResponse = (
-      prompt: string,
-      opts?: { temperature?: number }
-    ) => {
-      const engineOptions = {
-        model: config.model,
-        temperature: opts?.temperature,
-      };
-
-      switch (engineType) {
-        case "openAI":
-          return OpenAIEngine(config.apiKey, prompt, engineOptions);
-        case "anthropic":
-          return AnthropicEngine(
-            config.apiKey,
-            prompt,
-            engineOptions,
-            config.hasContext
-          );
-        case "gemini":
-          return GeminiEngine(config.apiKey, prompt, engineOptions);
-        case "ollama":
-          return OllamaEngine(config.apiKey, prompt, engineOptions);
-        default:
-          throw new Error("Unsupported engine type");
-      }
+/**
+ * Creates an AI engine instance based on the specified engine type.
+ * @param engineType - The type of AI engine to create.
+ * @param config - The configuration for the AI engine.
+ * @returns An instance of the AI engine.
+ */
+const Engine = (engineType: string, config: AiEngineConfig): AiEngine => {
+  const engineResponse = (prompt: string, opts?: { temperature?: number }) => {
+    const engineOptions = {
+      model: config.model,
+      temperature: opts?.temperature,
     };
 
-    return { config, engineResponse };
-  }
-}
+    switch (engineType) {
+      case "openAI":
+        return OpenAIEngine(config.apiKey, prompt, engineOptions);
+      case "anthropic":
+        return AnthropicEngine(
+          config.apiKey,
+          prompt,
+          engineOptions,
+          config.hasContext
+        );
+      case "gemini":
+        return GeminiEngine(config.apiKey, prompt, engineOptions);
+      case "ollama":
+        return OllamaEngine(config.apiKey, prompt, engineOptions);
+      default:
+        throw new Error("Unsupported engine type");
+    }
+  };
+
+  return { config, engineResponse };
+};
 
 /**
  * Main function to generate a response using the specified AI engine.
@@ -94,7 +81,7 @@ export async function generateResponse(
     hasContext,
   };
 
-  const engine = new Engine(engineType, config);
+  const engine = Engine(engineType, config);
 
   return await engine.engineResponse(prompt, {
     temperature: opts.temperature,

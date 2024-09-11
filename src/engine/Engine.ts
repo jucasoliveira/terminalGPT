@@ -6,6 +6,7 @@ import { OllamaEngine } from "./ollama"; // Import Ollama engine
 export interface AiEngineConfig {
   apiKey: string;
   model: string;
+  hasContext: boolean;
   maxTokensOutput: number;
   maxTokensInput: number;
   baseURL?: string;
@@ -48,7 +49,12 @@ export class Engine implements AiEngine {
         case "openAI":
           return OpenAIEngine(config.apiKey, prompt, engineOptions);
         case "anthropic":
-          return AnthropicEngine(config.apiKey, prompt, engineOptions);
+          return AnthropicEngine(
+            config.apiKey,
+            prompt,
+            engineOptions,
+            config.hasContext
+          );
         case "gemini":
           return GeminiEngine(config.apiKey, prompt, engineOptions);
         case "ollama":
@@ -77,13 +83,15 @@ export async function generateResponse(
   opts: {
     model: string;
     temperature?: number;
-  }
+  },
+  hasContext: boolean = false
 ): Promise<string | null | undefined> {
   const config: AiEngineConfig = {
     apiKey,
     model: opts.model,
     maxTokensOutput: 8192,
     maxTokensInput: 4096,
+    hasContext,
   };
 
   const engine = new Engine(engineType, config);

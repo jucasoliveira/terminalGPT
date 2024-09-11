@@ -11,6 +11,7 @@ import { marked } from "marked";
 
 import TerminalRenderer from "marked-terminal";
 
+import clipboard from "clipboardy";
 import { generateResponse } from "./engine/Engine";
 import { encrypt, getCredentials, saveCredentials } from "./creds";
 
@@ -103,10 +104,16 @@ export const promptResponse = async (
   opts: any
 ): Promise<void> => {
   try {
-    const request = await generateResponse(engine, apiKey, userInput, {
-      model: opts.model,
-      temperature: opts.temperature,
-    });
+    const request = await generateResponse(
+      engine,
+      apiKey,
+      userInput,
+      {
+        model: opts.model,
+        temperature: opts.temperature,
+      },
+      true
+    );
 
     const text = request ?? "";
 
@@ -121,7 +128,38 @@ export const promptResponse = async (
       process.stdout.write(markedText[i]);
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
-    // console.log("\n"); // Add a newline after the response
+  } catch (err) {
+    console.error(`${chalk.red("Something went wrong!!")} ${err}`);
+    // Error handling remains the same
+    // ...
+  }
+};
+
+export const promptCerebro = async (
+  engine: string,
+  apiKey: string,
+  userInput: string,
+  opts: any
+) => {
+  try {
+    const request = await generateResponse(
+      engine,
+      apiKey,
+      userInput,
+      {
+        model: opts.model,
+        temperature: opts.temperature,
+      },
+      false
+    );
+
+    const text = request ?? "";
+
+    if (!text) {
+      throw new Error("Undefined request or content");
+    }
+
+    return text;
   } catch (err) {
     console.error(`${chalk.red("Something went wrong!!")} ${err}`);
     // Error handling remains the same

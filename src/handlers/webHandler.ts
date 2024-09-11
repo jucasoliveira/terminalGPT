@@ -40,8 +40,7 @@ export async function handleWebResearch(query: string, userPrompt: string) {
       )
       .join("");
 
-    console.log(chalk.cyan("Search Results:"));
-    console.log(searchResults);
+    console.log(chalk.cyan("Found Results"));
 
     const webContext = `Web search results for "${query}":\n\n${searchResults}\n\nUser prompt: ${userPrompt}`;
     addContext({ role: "system", content: webContext });

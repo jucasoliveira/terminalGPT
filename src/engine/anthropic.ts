@@ -12,7 +12,8 @@ export const AnthropicEngine = async (
   opts: {
     model: string;
     temperature: unknown;
-  }
+  },
+  hasContext: boolean = false
 ) => {
   const apiKeyValue = await apiKey;
 
@@ -61,8 +62,10 @@ export const AnthropicEngine = async (
       .join("\n");
 
     if (message) {
-      addContext({ role: "user", content: prompt });
-      addContext({ role: "assistant", content: message });
+      if (hasContext) {
+        addContext({ role: "user", content: prompt });
+        addContext({ role: "assistant", content: message });
+      }
       spinner.stop();
       return message;
     } else {

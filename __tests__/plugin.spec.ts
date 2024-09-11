@@ -57,7 +57,7 @@ describe("Exit Plugin", () => {
   });
 
   it("should log goodbye message and exit the process when executed", async () => {
-    await expect(exitPlugin.execute()).rejects.toThrow(
+    await expect(exitPlugin.execute({})).rejects.toThrow(
       "Process.exit called with code: 0"
     );
     expect(consoleLogSpy).toHaveBeenCalledWith(

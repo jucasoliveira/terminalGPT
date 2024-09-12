@@ -10,7 +10,8 @@ export const OpenAIEngine = async (
   opts: {
     model: string;
     temperature: unknown;
-  }
+  },
+  hasContext: boolean = false
 ) => {
   const apiKeyValue = await apiKey;
   const openai = new OpenAI({ apiKey: apiKeyValue });
@@ -33,7 +34,9 @@ export const OpenAIEngine = async (
     });
 
     const message = completion.choices[0].message;
-    addContext({ role: message.role, content: message.content || "" });
+    if (hasContext) {
+      addContext({ role: message.role, content: message.content || "" });
+    }
 
     spinner.stop();
     return message.content;

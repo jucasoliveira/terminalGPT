@@ -26,7 +26,6 @@ export const AnthropicEngine = async (
     let messages: ContextItem[] = [];
     let systemMessage = "";
 
-    console.log(relevantContext);
     // Process relevant context
     for (const item of relevantContext) {
       if (item.role === "system") {

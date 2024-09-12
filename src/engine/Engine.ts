@@ -35,7 +35,12 @@ const Engine = (engineType: string, config: AiEngineConfig): AiEngine => {
 
     switch (engineType) {
       case "openAI":
-        return OpenAIEngine(config.apiKey, prompt, engineOptions);
+        return OpenAIEngine(
+          config.apiKey,
+          prompt,
+          engineOptions,
+          config.hasContext
+        );
       case "anthropic":
         return AnthropicEngine(
           config.apiKey,
@@ -44,9 +49,20 @@ const Engine = (engineType: string, config: AiEngineConfig): AiEngine => {
           config.hasContext
         );
       case "gemini":
-        return GeminiEngine(config.apiKey, prompt, engineOptions);
+        return GeminiEngine(
+          config.apiKey,
+          prompt,
+          engineOptions,
+          config.hasContext
+        );
       case "ollama":
-        return OllamaEngine(config.apiKey, prompt, engineOptions);
+        return OllamaEngine(
+          config.apiKey,
+          prompt,
+          engineOptions,
+          config.hasContext,
+          config.baseURL
+        );
       default:
         throw new Error("Unsupported engine type");
     }

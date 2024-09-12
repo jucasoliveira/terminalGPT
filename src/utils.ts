@@ -13,6 +13,8 @@ import TerminalRenderer from "marked-terminal";
 
 import { generateResponse } from "./engine/Engine";
 import { encrypt, getCredentials, saveCredentials } from "./creds";
+import { getTerminalGPTLatestVersion } from "./version";
+import currentPackage from "../package.json";
 
 marked.setOptions({
   // Define custom renderer
@@ -103,10 +105,16 @@ export const promptResponse = async (
   opts: any
 ): Promise<void> => {
   try {
-    const request = await generateResponse(engine, apiKey, userInput, {
-      model: opts.model,
-      temperature: opts.temperature,
-    });
+    const request = await generateResponse(
+      engine,
+      apiKey,
+      userInput,
+      {
+        model: opts.model,
+        temperature: opts.temperature,
+      },
+      true
+    );
 
     const text = request ?? "";
 
@@ -121,10 +129,62 @@ export const promptResponse = async (
       process.stdout.write(markedText[i]);
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
-    // console.log("\n"); // Add a newline after the response
   } catch (err) {
     console.error(`${chalk.red("Something went wrong!!")} ${err}`);
     // Error handling remains the same
     // ...
+  }
+};
+
+export const promptCerebro = async (
+  engine: string,
+  apiKey: string,
+  userInput: string,
+  opts: any
+) => {
+  try {
+    const request = await generateResponse(
+      engine,
+      apiKey,
+      userInput,
+      {
+        model: opts.model,
+        temperature: opts.temperature,
+      },
+      false
+    );
+
+    const text = request ?? "";
+
+    if (!text) {
+      throw new Error("Undefined request or content");
+    }
+
+    return text;
+  } catch (err) {
+    console.error(`${chalk.red("Something went wrong!!")} ${err}`);
+    // Error handling remains the same
+    // ...
+  }
+};
+
+export const checkIsLatestVersion = async () => {
+  const latestVersion = await getTerminalGPTLatestVersion();
+
+  if (latestVersion) {
+    const currentVersion = currentPackage.version;
+
+    if (currentVersion !== latestVersion) {
+      console.log(
+        chalk.yellow(
+          `
+    You are not using the latest stable version of TerminalGPT with new features and bug fixes.
+    Current version: ${currentVersion}. Latest version: ${latestVersion}.
+    🚀 To update run: npm i -g terminalgpt@latest.
+    Or run @update to update the package.
+        `
+        )
+      );
+    }
   }
 };

@@ -10,7 +10,8 @@ export const GeminiEngine = async (
     temperature?: number; // Optional temperature setting
     filePath?: string; // Optional file path for uploads
     mimeType?: string; // Optional MIME type for the file
-  }
+  },
+  hasContext: boolean = false
 ) => {
   const apiKeyValue = await apiKey;
   const genAI = new GoogleGenerativeAI(apiKeyValue);
@@ -53,7 +54,10 @@ export const GeminiEngine = async (
     const responseText = result.response.text();
 
     if (responseText) {
-      addContext({ role: "assistant", content: responseText });
+      if (hasContext) {
+        addContext({ role: "user", content: prompt });
+        addContext({ role: "assistant", content: responseText });
+      }
       spinner.stop();
       return responseText;
     } else {

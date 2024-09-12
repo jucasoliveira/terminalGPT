@@ -64,7 +64,6 @@ class VectorStore {
   getRelevantContext(query: string, k: number = 5): ContextItem[] {
     try {
       if (this.items.length === 0) {
-        // console.log("No items in context");
         return [];
       }
       const queryVector = this.textToVector(query);
@@ -114,7 +113,6 @@ try {
 }
 
 export function addContext(item: ContextItem) {
-  // console.log("Adding context:", item); // Debug log
   const existingItems = vectorStore.getRelevantContext(item.content);
   if (
     !existingItems.some(
@@ -123,17 +121,13 @@ export function addContext(item: ContextItem) {
     )
   ) {
     vectorStore.addItem(item);
-  } else {
-    // console.log("Skipping duplicate context item");
   }
 }
 
 export function getContext(query: string): ContextItem[] {
-  // console.log("Getting context for query:", query); // Debug log
   return vectorStore.getRelevantContext(query);
 }
 
 export function clearContext() {
-  // console.log("Clearing context"); // Debug log
   vectorStore = new VectorStore();
 }

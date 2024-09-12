@@ -4,10 +4,10 @@ import { Plugin } from "./index";
 import { handleWebResearch } from "../handlers/webHandler";
 import { promptResponse } from "../utils";
 
-const webPlugin: Plugin = {
-  name: "web",
-  keyword: "@web",
-  description: "Performs web research based on the given query",
+const scrapperPlugin: Plugin = {
+  name: "scrapper",
+  keyword: "@scrapper",
+  description: "Scrapes / Reads a website and returns the content",
   execute: async (context: {
     userInput: string;
     engine: string;
@@ -15,20 +15,19 @@ const webPlugin: Plugin = {
     opts: any;
   }) => {
     const { userInput, engine, apiKey, opts } = context;
-    const query = userInput.slice(5).trim(); // Remove "@web " from the input
+    const url = userInput.slice(5).trim(); // Remove "@scrapper " from the input
 
-    if (query) {
+    if (url) {
       try {
-        const researchResults = await handleWebResearch(query, userInput);
+        const researchResults = await handleWebResearch(url, userInput);
         console.log(chalk.cyan("Web research results:"));
         console.log(researchResults);
 
         // Use the research results to generate a response
         const enhancedPrompt = `Based on the following web research results, please provide a summary or answer:
-        
         ${researchResults}
         
-        User query: ${query}`;
+        User query: ${url}`;
 
         const response = await promptResponse(
           engine,
@@ -42,12 +41,10 @@ const webPlugin: Plugin = {
         return `Error: ${error}`;
       }
     } else {
-      console.log(
-        chalk.yellow("Please provide a search query. Usage: @web <query>")
-      );
-      return "Error: No search query provided";
+      console.log(chalk.yellow("Please provide a URL. Usage: @scrapper <URL>"));
+      return "Error: No URL provided";
     }
   },
 };
 
-export default webPlugin;
+export default scrapperPlugin;

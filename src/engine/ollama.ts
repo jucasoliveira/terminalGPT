@@ -9,7 +9,9 @@ export const OllamaEngine = async (
   opts: {
     model: string; // Specify the model to use
     temperature: unknown;
-  }
+  },
+  hasContext: boolean = false,
+  baseURL: string = "http://localhost:11434"
 ) => {
   const apiKeyValue = await apiKey;
   const spinner = loadWithRocketGradient("Thinking...").start();
@@ -18,7 +20,7 @@ export const OllamaEngine = async (
 
   try {
     const response = await axios.post(
-      `http://localhost:11434/api/chat`, // Replace with the actual Ollama API endpoint
+      `${baseURL}/api/chat`,
       {
         model: opts.model || "llama2", // Use a default model if none is provided
         messages: [
@@ -41,7 +43,10 @@ export const OllamaEngine = async (
     const message = response.data.message?.content;
 
     if (message) {
-      addContext({ role: "assistant", content: message });
+      if (hasContext) {
+        addContext({ role: "user", content: prompt });
+        addContext({ role: "assistant", content: message });
+      }
       spinner.stop();
       return message;
     } else {

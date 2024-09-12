@@ -5,7 +5,7 @@ import chalk from "chalk";
 import * as process from "process";
 import { Command } from "commander";
 import intro from "./intro";
-import { apiKeyPrompt, promptResponse } from "./utils";
+import { apiKeyPrompt, checkIsLatestVersion, promptResponse } from "./utils";
 import { deleteCredentials } from "./creds";
 import readline from "readline";
 import { findPlugin, executePlugin, initializePlugins } from "./commands";
@@ -20,6 +20,7 @@ program
   .usage(`"<project-directory>" [options]`)
   .action(async (opts) => {
     intro();
+    await checkIsLatestVersion();
     const creds = await apiKeyPrompt();
 
     // Initialize plugins

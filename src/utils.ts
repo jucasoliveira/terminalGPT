@@ -13,6 +13,8 @@ import TerminalRenderer from "marked-terminal";
 
 import { generateResponse } from "./engine/Engine";
 import { encrypt, getCredentials, saveCredentials } from "./creds";
+import { getTerminalGPTLatestVersion } from "./version";
+import currentPackage from "../package.json";
 
 marked.setOptions({
   // Define custom renderer
@@ -163,5 +165,26 @@ export const promptCerebro = async (
     console.error(`${chalk.red("Something went wrong!!")} ${err}`);
     // Error handling remains the same
     // ...
+  }
+};
+
+export const checkIsLatestVersion = async () => {
+  const latestVersion = await getTerminalGPTLatestVersion();
+
+  if (latestVersion) {
+    const currentVersion = currentPackage.version;
+
+    if (currentVersion !== latestVersion) {
+      console.log(
+        chalk.yellow(
+          `
+    You are not using the latest stable version of TerminalGPT with new features and bug fixes.
+    Current version: ${currentVersion}. Latest version: ${latestVersion}.
+    🚀 To update run: npm i -g terminalgpt@latest.
+    Or run @update to update the package.
+        `
+        )
+      );
+    }
   }
 };

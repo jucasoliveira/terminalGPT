@@ -126,23 +126,25 @@ export function getCredentials(): {
   apiKey: string | null;
   engine: string | null;
   tavilyApiKey: string | null;
+  model: string | null;
 } {
   if (fs.existsSync(`${__dirname}/credentials.json`)) {
     try {
       const data = fs.readFileSync(`${__dirname}/credentials.json`, "utf8");
-      const { apiKey, engine, tavilyApiKey } = JSON.parse(data);
+      const { apiKey, engine, tavilyApiKey, model } = JSON.parse(data);
       return {
         apiKey: apiKey ? decrypt(apiKey) : null,
         engine: engine || null,
         tavilyApiKey: tavilyApiKey ? decrypt(tavilyApiKey) : null,
+        model: model || null,
       };
     } catch (error) {
       console.error("Error reading or parsing credentials:", error);
-      return { apiKey: null, engine: null, tavilyApiKey: null };
+      return { apiKey: null, engine: null, tavilyApiKey: null, model: null };
     }
   }
   console.log("Credentials file not found");
-  return { apiKey: null, engine: null, tavilyApiKey: null };
+  return { apiKey: null, engine: null, tavilyApiKey: null, model: null };
 }
 
 /**

@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { addContext, getContext } from "../context";
 import { loadWithRocketGradient } from "../gradient";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import { combineConsecutiveMessages, ensureMessagesAlternate } from "./common";
 
 export const OpenAIEngine = async (
   apiKey: string | Promise<string>,
@@ -19,13 +20,20 @@ export const OpenAIEngine = async (
 
   try {
     const relevantContext = getContext(prompt);
-    const messages: ChatCompletionMessageParam[] = [
-      ...relevantContext.map((item) => ({
+
+    // Process and combine messages
+    let processedMessages = combineConsecutiveMessages(relevantContext);
+    processedMessages = ensureMessagesAlternate(processedMessages);
+
+    // Add the current prompt
+    processedMessages.push({ role: "user", content: prompt });
+
+    const messages: ChatCompletionMessageParam[] = processedMessages.map(
+      (item) => ({
         role: item.role as "system" | "user" | "assistant",
         content: item.content,
-      })),
-      { role: "user", content: prompt },
-    ];
+      })
+    );
 
     const completion = await openai.chat.completions.create({
       model: opts.model || "gpt-4o-2024-08-06",

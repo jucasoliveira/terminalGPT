@@ -43,7 +43,7 @@ program
                 userInput,
                 engine: creds.engine,
                 apiKey: creds.apiKey,
-                opts,
+                opts: { ...opts, model: creds.model || undefined },
               });
             } else {
               // Use LLM to determine if a plugin should be used
@@ -51,7 +51,7 @@ program
                 creds.engine,
                 creds.apiKey,
                 userInput,
-                opts
+                { ...opts, model: creds.model || undefined }
               );
 
               if (pluginKeyword !== "none") {
@@ -62,19 +62,17 @@ program
                     userInput,
                     engine: creds.engine,
                     apiKey: creds.apiKey,
-                    opts,
+                    opts: { ...opts, model: creds.model || undefined },
                   });
                 } else {
                   console.log(chalk.red(`Plugin not found: ${pluginKeyword}`));
                 }
               } else {
                 // No plugin applicable, use regular promptResponse
-                await promptResponse(
-                  creds.engine,
-                  creds.apiKey,
-                  userInput,
-                  opts
-                );
+                await promptResponse(creds.engine, creds.apiKey, userInput, {
+                  ...opts,
+                  model: creds.model || undefined,
+                });
               }
             }
           } catch (error) {

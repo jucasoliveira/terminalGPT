@@ -4,6 +4,12 @@
 
 <h1 align="center">TerminalGPT</h1>
 
+
+<p align="center" class={{ marginTop: "10px"}}>
+  <img width="500" alt="TerminalGPT logo" src="https://github.com/user-attachments/assets/c5ea1861-5994-4fe2-af44-ac92c1fa3013"/>
+</p>
+
+
 <p align="center">
   <strong>Get GPT-like chatGPT on your terminal</strong>
 </p>

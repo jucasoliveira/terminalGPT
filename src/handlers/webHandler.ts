@@ -18,6 +18,7 @@ export async function handleWebResearch(query: string, userPrompt: string) {
       saveCredentials(
         credentials.apiKey || "",
         credentials.engine || "",
+        credentials.model || "",
         tavilyApiKey
       );
       credentials = getCredentials();

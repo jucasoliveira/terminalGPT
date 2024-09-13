@@ -30,6 +30,7 @@ export async function apiKeyPrompt() {
   const credentials = getCredentials();
   const apiKey = credentials?.apiKey;
   const engine = credentials?.engine;
+  const model = credentials?.model;
 
   const questions: PromptObject<string>[] = [
     {
@@ -37,31 +38,61 @@ export async function apiKeyPrompt() {
       name: "engine",
       message: "Pick LLM",
       choices: [
-        { title: "openAI", value: "openAI" },
-        { title: "anthropic", value: "anthropic" },
-        { title: "gemini", value: "gemini" },
-        { title: "ollama", value: "ollama" },
+        { title: "OpenAI", value: "openAI" },
+        { title: "Anthropic", value: "anthropic" },
+        { title: "Gemini", value: "gemini" },
+        { title: "Ollama", value: "ollama" },
       ],
       initial: 0,
     },
     {
-      type: "password",
+      type: (prev) => (prev === "ollama" ? null : "password"),
       name: "apiKey",
-      message: "Enter your OpenAI API key:",
-      validate: (value: string) => {
-        return value !== "";
+      message: (prev) => `Enter your ${prev} API key:`,
+      validate: (value: string) => value !== "",
+    },
+    {
+      type: (prev, values) => (values.engine === "ollama" ? null : "select"),
+      name: "model",
+      message: "Select model",
+      choices: (prev, values) => {
+        switch (values.engine) {
+          case "openAI":
+            return [
+              { title: "GPT-3.5-turbo", value: "gpt-3.5-turbo" },
+              { title: "GPT-4", value: "gpt-4" },
+              { title: "GPT-4o", value: "gpt-4o" },
+              { title: "GPT-o1 Preview", value: "o1-preview" },
+              { title: "GPT-4o Mini", value: "gpt-4o-mini" },
+              { title: "GPT-o1 Mini", value: "o1-mini" },
+            ];
+          case "anthropic":
+            return [
+              { title: "Claude 2", value: "claude-2" },
+              { title: "Claude 3 Opus", value: "claude-3-opus-20240229" },
+              { title: "Claude 3 Sonnet", value: "claude-3-sonnet-20240229" },
+            ];
+          case "gemini":
+            return [{ title: "Gemini Pro", value: "gemini-pro" }];
+          default:
+            return [];
+        }
       },
     },
   ];
 
-  if (!apiKey || !engine) {
+  if (!apiKey || !engine || !model) {
     const response = await prompts(questions);
-    // Save both API key and engine
-    saveCredentials(encrypt(response.apiKey), response.engine);
-    return { apiKey: response.apiKey, engine: response.engine };
+    // Save API key, engine, and model
+    saveCredentials(encrypt(response.apiKey), response.engine, response.model);
+    return {
+      apiKey: response.apiKey,
+      engine: response.engine,
+      model: response.model,
+    };
   }
 
-  return { apiKey, engine };
+  return { apiKey, engine, model };
 }
 
 /**

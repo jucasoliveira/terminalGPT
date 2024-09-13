@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { addContext, getContext } from "../context";
 import { loadWithRocketGradient } from "../gradient";
+import { combineConsecutiveMessages, ensureMessagesAlternate } from "./common";
 
 export const GeminiEngine = async (
   apiKey: string | Promise<string>,
@@ -32,22 +33,22 @@ export const GeminiEngine = async (
       responseMimeType: "text/plain",
     };
 
-    // Prepare chat history with context
+    // Process and combine messages
     const relevantContext = getContext(prompt);
-    const chatHistory = relevantContext.map((context) => ({
-      role: context.role as "user" | "model",
+    let processedMessages = combineConsecutiveMessages(relevantContext);
+    processedMessages = ensureMessagesAlternate(processedMessages);
+
+    // Add the current prompt
+    processedMessages.push({ role: "user", content: prompt });
+
+    const chatHistory = processedMessages.map((context) => ({
+      role: context.role === "assistant" ? "model" : "user",
       parts: [{ text: context.content }],
     }));
 
     const chatSession = model.startChat({
       generationConfig,
-      history: [
-        ...chatHistory,
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
+      history: chatHistory,
     });
 
     const result = await chatSession.sendMessage(prompt);
@@ -55,7 +56,6 @@ export const GeminiEngine = async (
 
     if (responseText) {
       if (hasContext) {
-        addContext({ role: "user", content: prompt });
         addContext({ role: "assistant", content: responseText });
       }
       spinner.stop();

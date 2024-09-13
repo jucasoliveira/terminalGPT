@@ -6,13 +6,52 @@ import { addContext, getContext, ContextItem } from "../context";
 import { loadWithRocketGradient } from "../gradient";
 import chalk from "chalk";
 
+const combineConsecutiveMessages = (messages: ContextItem[]): ContextItem[] => {
+  if (messages.length === 0) return messages;
+
+  const combinedMessages: ContextItem[] = [messages[0]];
+
+  for (let i = 1; i < messages.length; i++) {
+    const lastMessage = combinedMessages[combinedMessages.length - 1];
+    const currentMessage = messages[i];
+
+    if (currentMessage.role === lastMessage.role) {
+      lastMessage.content += "\n" + currentMessage.content;
+    } else {
+      combinedMessages.push(currentMessage);
+    }
+  }
+
+  return combinedMessages;
+};
+
+const ensureMessagesAlternate = (messages: ContextItem[]): ContextItem[] => {
+  const alternatingMessages: ContextItem[] = [];
+
+  // Ensure the first message is from the user
+  let expectedRole: "user" | "assistant" = "user";
+
+  for (const message of messages) {
+    if (message.role !== expectedRole) {
+      // Skip or adjust message
+      continue; // or handle as needed
+    }
+
+    alternatingMessages.push(message);
+    expectedRole = expectedRole === "user" ? "assistant" : "user";
+  }
+
+  return alternatingMessages;
+};
+
 export const AnthropicEngine = async (
   apiKey: string | Promise<string>,
   prompt: string,
   opts: {
     model: string;
     temperature: unknown;
-  }
+  },
+  hasContext: boolean = false
 ) => {
   const apiKeyValue = await apiKey;
 
@@ -34,16 +73,20 @@ export const AnthropicEngine = async (
       }
     }
 
-    // Ensure messages alternate and start with a user message
-    if (messages.length === 0 || messages[0].role !== "user") {
-      messages = [{ role: "user", content: prompt }];
+    // Combine consecutive messages with the same role
+    messages = combineConsecutiveMessages(messages);
+
+    // Ensure messages start with 'user' and roles alternate
+    messages = ensureMessagesAlternate(messages);
+
+    // Add the current prompt as a 'user' message
+    if (
+      messages.length === 0 ||
+      messages[messages.length - 1].role !== "user"
+    ) {
+      messages.push({ role: "user", content: prompt });
     } else {
-      // If the last message is from the user, combine it with the new prompt
-      if (messages[messages.length - 1].role === "user") {
-        messages[messages.length - 1].content += "\n" + prompt;
-      } else {
-        messages.push({ role: "user", content: prompt });
-      }
+      messages[messages.length - 1].content += "\n" + prompt;
     }
 
     const requestParams: MessageCreateParamsNonStreaming = {
@@ -61,8 +104,10 @@ export const AnthropicEngine = async (
       .join("\n");
 
     if (message) {
-      addContext({ role: "user", content: prompt });
-      addContext({ role: "assistant", content: message });
+      if (hasContext) {
+        addContext({ role: "user", content: prompt });
+        addContext({ role: "assistant", content: message });
+      }
       spinner.stop();
       return message;
     } else {

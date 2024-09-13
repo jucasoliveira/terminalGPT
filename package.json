@@ -1,6 +1,6 @@
 {
   "name": "terminalgpt",
-  "version": "1.7.6",
+  "version": "2.0.1",
   "main": "lib/index.js",
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {
@@ -43,6 +43,7 @@
     "clipboardy": "2.3.0",
     "commander": "^9.5.0",
     "compromise": "^14.8.1",
+    "execa": "^9.3.1",
     "gradient-string": "^2.0.2",
     "hnswlib-node": "^3.0.0",
     "lowdb": "^5.1.0",
@@ -59,6 +60,7 @@
     "@types/chalk": "^2.2.0",
     "@types/clipboardy": "2.0.1",
     "@types/eslint": "^8.44.2",
+    "@types/execa": "^2.0.0",
     "@types/jest": "^29.5.4",
     "@types/ora": "^3.2.0",
     "@typescript-eslint/eslint-plugin": "^6.4.1",

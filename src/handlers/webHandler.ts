@@ -18,6 +18,7 @@ export async function handleWebResearch(query: string, userPrompt: string) {
       saveCredentials(
         credentials.apiKey || "",
         credentials.engine || "",
+        credentials.model || "",
         tavilyApiKey
       );
       credentials = getCredentials();
@@ -36,12 +37,11 @@ export async function handleWebResearch(query: string, userPrompt: string) {
     const searchResults = response.data.results
       .map(
         (result: any) =>
-          `Title: ${result.title}\nSnippet: ${result.content}\n\n`
+          `Title: ${result.title}\nContent: ${result.content}\n\n`
       )
       .join("");
 
-    console.log(chalk.cyan("Search Results:"));
-    console.log(searchResults);
+    console.log(chalk.cyan("Found Results"));
 
     const webContext = `Web search results for "${query}":\n\n${searchResults}\n\nUser prompt: ${userPrompt}`;
     addContext({ role: "system", content: webContext });
@@ -50,6 +50,7 @@ export async function handleWebResearch(query: string, userPrompt: string) {
         `Web research results for "${query}" have been added to the conversation context.`
       )
     );
+    return webContext;
   } catch (error: any) {
     console.error(chalk.red(`Error performing web research: ${error.message}`));
   }

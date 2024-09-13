@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { addContext, getContext } from "../context";
 import { loadWithRocketGradient } from "../gradient";
 import axios from "axios";
+import { combineConsecutiveMessages, ensureMessagesAlternate } from "./common";
 
 export const OllamaEngine = async (
   apiKey: string | Promise<string>,
@@ -9,7 +10,9 @@ export const OllamaEngine = async (
   opts: {
     model: string; // Specify the model to use
     temperature: unknown;
-  }
+  },
+  hasContext: boolean = false,
+  baseURL: string = "http://localhost:11434"
 ) => {
   const apiKeyValue = await apiKey;
   const spinner = loadWithRocketGradient("Thinking...").start();
@@ -17,17 +20,21 @@ export const OllamaEngine = async (
   const relevantContext = getContext(prompt);
 
   try {
+    // Process and combine messages
+    let processedMessages = combineConsecutiveMessages(relevantContext);
+    processedMessages = ensureMessagesAlternate(processedMessages);
+
+    // Add the current prompt
+    processedMessages.push({ role: "user", content: prompt });
+
     const response = await axios.post(
-      `http://localhost:11434/api/chat`, // Replace with the actual Ollama API endpoint
+      `${baseURL}/api/chat`,
       {
         model: opts.model || "llama2", // Use a default model if none is provided
-        messages: [
-          ...relevantContext.map((item) => ({
-            role: item.role,
-            content: item.content,
-          })),
-          { role: "user", content: prompt },
-        ],
+        messages: processedMessages.map((item) => ({
+          role: item.role,
+          content: item.content,
+        })),
         temperature: opts.temperature ? Number(opts.temperature) : 1,
       },
       {
@@ -41,7 +48,9 @@ export const OllamaEngine = async (
     const message = response.data.message?.content;
 
     if (message) {
-      addContext({ role: "assistant", content: message });
+      if (hasContext) {
+        addContext({ role: "assistant", content: message });
+      }
       spinner.stop();
       return message;
     } else {
@@ -49,7 +58,7 @@ export const OllamaEngine = async (
     }
   } catch (err) {
     spinner.stop();
-    // Handle errors similarly to OpenAI
+    // Error handling remains the same
     if (axios.isAxiosError(err)) {
       console.log(err);
       switch (err.response?.status) {

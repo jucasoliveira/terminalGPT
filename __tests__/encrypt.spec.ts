@@ -51,20 +51,24 @@ describe("Credentials Management", () => {
     expect(result).to.deep.equal({
       apiKey: null,
       engine: null,
+      model: null,
       tavilyApiKey: null,
     });
   });
 
   it("should save and retrieve credentials correctly", () => {
-    saveCredentials("testApiKey", "testEngine", "testTavilyApiKey");
+    saveCredentials("testApiKey", "testEngine", "model", "testTavilyApiKey");
     const result = getCredentials();
-    expect(result.apiKey).to.equal("testApiKey");
-    expect(result.engine).to.equal("testEngine");
-    expect(result.tavilyApiKey).to.equal("testTavilyApiKey");
+    expect(result).to.deep.equal({
+      apiKey: "testApiKey",
+      engine: "testEngine",
+      model: "model",
+      tavilyApiKey: "testTavilyApiKey",
+    });
   });
 
   it("should encrypt the API key when saving", () => {
-    saveCredentials("testApiKey", "testEngine", "testTavilyApiKey");
+    saveCredentials("testApiKey", "testEngine", "model", "testTavilyApiKey");
     const rawData = fs.readFileSync(credentialsPath, "utf-8");
     const savedCredentials = JSON.parse(rawData);
     expect(savedCredentials.apiKey).to.not.equal("testApiKey");

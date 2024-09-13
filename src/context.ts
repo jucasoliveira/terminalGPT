@@ -7,78 +7,86 @@ export interface ContextItem {
   content: string;
 }
 
-class VectorStore {
-  private index: hnswlib.HierarchicalNSW;
-  private items: ContextItem[];
-  private encoder: any;
-  private maxTokens: number;
-  private currentTokens: number;
-  private readonly dimension: number = 1536; // Fixed dimension size
+interface VectorStore {
+  addItem: (item: ContextItem) => void;
+  getRelevantContext: (query: string, k?: number) => ContextItem[];
+}
 
-  constructor(
-    model: TiktokenModel = "gpt-3.5-turbo",
-    maxTokens: number = 4096
-  ) {
-    try {
-      this.encoder = encoding_for_model(model);
-      this.index = new hnswlib.HierarchicalNSW("cosine", this.dimension);
-      this.index.initIndex(1000); // Initialize index with a maximum of 1000 elements
-      this.items = [];
-      this.maxTokens = maxTokens;
-      this.currentTokens = 0;
-    } catch (error) {
-      console.error("Error initializing VectorStore:", error);
-      throw new Error("Failed to initialize VectorStore");
-    }
+const createVectorStore = (
+  model: TiktokenModel = "gpt-4o",
+  maxTokens: number = 4096
+): VectorStore => {
+  const dimension: number = 1536; // Fixed dimension size
+  let index: hnswlib.HierarchicalNSW = new hnswlib.HierarchicalNSW(
+    "cosine",
+    dimension
+  );
+  const items: ContextItem[] = [];
+  let encoder: any = encoding_for_model(model);
+  let currentTokens: number = 0;
+
+  try {
+    encoder = encoding_for_model(model);
+    index = new hnswlib.HierarchicalNSW("cosine", dimension);
+    index.initIndex(1000); // Initialize index with a maximum of 1000 elements
+  } catch (error) {
+    console.error("Error initializing VectorStore:", error);
+    throw new Error("Failed to initialize VectorStore");
   }
 
-  addItem(item: ContextItem) {
+  const textToVector = (text: string): number[] => {
+    try {
+      const encoded = encoder.encode(text);
+      const vector = new Array(dimension).fill(0);
+      for (let i = 0; i < encoded.length && i < dimension; i++) {
+        vector[i] = encoded[i] / 100; // Simple normalization
+      }
+      return vector;
+    } catch (error) {
+      console.error("Error converting text to vector:", error);
+      throw new Error("Failed to convert text to vector");
+    }
+  };
+
+  const addItem = (item: ContextItem) => {
     try {
       if (!item || typeof item.content !== "string") {
         console.error("Invalid item:", item);
         return;
       }
-      const vector = this.textToVector(item.content);
-      const tokenCount = this.encoder.encode(item.content).length;
+      const vector = textToVector(item.content);
+      const tokenCount = encoder.encode(item.content).length;
 
       // Remove old items if adding this would exceed the token limit
-      while (
-        this.currentTokens + tokenCount > this.maxTokens &&
-        this.items.length > 0
-      ) {
-        const removedItem = this.items.shift();
+      while (currentTokens + tokenCount > maxTokens && items.length > 0) {
+        const removedItem = items.shift();
         if (removedItem) {
-          this.currentTokens -= this.encoder.encode(removedItem.content).length;
+          currentTokens -= encoder.encode(removedItem.content).length;
         }
       }
 
-      const id = this.items.length;
-      this.index.addPoint(vector, id);
-      this.items.push(item);
-      this.currentTokens += tokenCount;
+      const id = items.length;
+      index.addPoint(vector, id);
+      items.push(item);
+      currentTokens += tokenCount;
     } catch (error) {
       console.error("Error adding item to VectorStore:", error);
     }
-  }
+  };
 
-  getRelevantContext(query: string, k: number = 5): ContextItem[] {
+  const getRelevantContext = (query: string, k: number = 5): ContextItem[] => {
     try {
-      if (this.items.length === 0) {
-        // console.log("No items in context");
+      if (items.length === 0) {
         return [];
       }
-      const queryVector = this.textToVector(query);
-      const results = this.index.searchKnn(
-        queryVector,
-        Math.min(k, this.items.length)
-      );
+      const queryVector = textToVector(query);
+      const results = index.searchKnn(queryVector, Math.min(k, items.length));
       if (!results || !Array.isArray(results.neighbors)) {
-        // console.error("Unexpected result from searchKnn:", results);
         return [];
       }
       return results.neighbors.map(
         (id) =>
-          this.items[id] || {
+          items[id] || {
             role: "system",
             content: "Context item not found",
           }
@@ -87,34 +95,21 @@ class VectorStore {
       console.error("Error getting relevant context:", error);
       return [];
     }
-  }
+  };
 
-  private textToVector(text: string): number[] {
-    try {
-      const encoded = this.encoder.encode(text);
-      const vector = new Array(this.dimension).fill(0);
-      for (let i = 0; i < encoded.length && i < this.dimension; i++) {
-        vector[i] = encoded[i] / 100; // Simple normalization
-      }
-      return vector;
-    } catch (error) {
-      console.error("Error converting text to vector:", error);
-      throw new Error("Failed to convert text to vector");
-    }
-  }
-}
+  return { addItem, getRelevantContext };
+};
 
 let vectorStore: VectorStore;
 
 try {
-  vectorStore = new VectorStore();
+  vectorStore = createVectorStore();
 } catch (error) {
   console.error("Error creating VectorStore:", error);
   throw new Error("Failed to create VectorStore");
 }
 
 export function addContext(item: ContextItem) {
-  // console.log("Adding context:", item); // Debug log
   const existingItems = vectorStore.getRelevantContext(item.content);
   if (
     !existingItems.some(
@@ -123,17 +118,13 @@ export function addContext(item: ContextItem) {
     )
   ) {
     vectorStore.addItem(item);
-  } else {
-    // console.log("Skipping duplicate context item");
   }
 }
 
 export function getContext(query: string): ContextItem[] {
-  // console.log("Getting context for query:", query); // Debug log
   return vectorStore.getRelevantContext(query);
 }
 
 export function clearContext() {
-  // console.log("Clearing context"); // Debug log
-  vectorStore = new VectorStore();
+  vectorStore = createVectorStore();
 }

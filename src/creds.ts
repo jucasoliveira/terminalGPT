@@ -103,12 +103,14 @@ export function getEngine(): string | null {
 export function saveCredentials(
   apiKey: string,
   engine: string,
+  model: string,
   tavilyApiKey?: string
 ) {
   const credentials = {
     apiKey: encrypt(apiKey),
     engine,
     tavilyApiKey: tavilyApiKey ? encrypt(tavilyApiKey) : undefined,
+    model,
   };
   fs.writeFileSync(
     `${__dirname}/credentials.json`,

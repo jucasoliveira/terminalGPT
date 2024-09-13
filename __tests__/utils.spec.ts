@@ -18,6 +18,7 @@ describe("apiKeyPrompt()", () => {
         JSON.stringify({
           apiKey: encrypt("test"),
           engine: "test",
+          model: "test",
           tavilyApiKey: encrypt("test"),
         })
       );
@@ -29,6 +30,7 @@ describe("apiKeyPrompt()", () => {
     expect(result).to.be.an("object");
     expect(result).to.have.property("apiKey");
     expect(result).to.have.property("engine");
+    expect(result).to.have.property("model");
   });
 });
 

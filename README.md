@@ -15,6 +15,12 @@
   <img src="https://img.shields.io/github/package-json/v/jucasoliveira/terminalGPT" alt="Version"/>
 </p>
 
+## Stats
+
+<p align="center">
+   <img alt="TerminalGPT stats" src="https://repobeats.axiom.co/api/embed/92b8c74cac77f3fbb0e843cc3f6a36b01e7bd152.svg"/>
+</p>
+
 <p align="center">
   <img alt="TerminalGPT demo" src="https://github.com/jucasoliveira/terminalGPT/assets/11979969/3de20615-87ad-4157-99ad-33ba2687214b"/>
 </p>
@@ -81,9 +87,3 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contrib
 <a href="https://github.com/jucasoliveira/terminalGPT/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=jucasoliveira/terminalGPT" />
 </a>
-
-## Stats
-
-<p align="center">
-   <img alt="TerminalGPT stats" src="https://repobeats.axiom.co/api/embed/92b8c74cac77f3fbb0e843cc3f6a36b01e7bd152.svg"/>
-</p>

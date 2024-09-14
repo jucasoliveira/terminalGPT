@@ -90,6 +90,55 @@ program
   });
 
 program
+  .command("one-shot <question>")
+  .description("Ask a one-shot question and get a quick answer")
+  .option("-e, --engine <engine>", "LLM to use")
+  .option("-t, --temperature <temperature>", "Response temperature")
+  .action(async (question, opts) => {
+    await checkIsLatestVersion();
+    const creds = await apiKeyPrompt();
+
+    if (creds.apiKey != null) {
+      try {
+        // Use LLM to determine if a plugin should be used
+        const pluginKeyword = await determinePlugins(
+          creds.engine,
+          creds.apiKey,
+          question,
+          { ...opts, model: creds.model || undefined }
+        );
+
+        if (pluginKeyword !== "none") {
+          const plugin = findPlugin(pluginKeyword);
+          if (plugin) {
+            console.log(chalk.yellow(`Executing plugin: ${plugin.name}`));
+            await executePlugin(plugin, {
+              userInput: question,
+              engine: creds.engine,
+              apiKey: creds.apiKey,
+              opts: { ...opts, model: creds.model || undefined },
+            });
+          } else {
+            console.log(chalk.red(`Plugin not found: ${pluginKeyword}`));
+          }
+        } else {
+          // No plugin applicable, use regular promptResponse
+          await promptResponse(creds.engine, creds.apiKey, question, {
+            ...opts,
+            model: creds.model || undefined,
+          });
+        }
+      } catch (error) {
+        console.error(chalk.red("An error occurred:"), error);
+      }
+    } else {
+      console.log(chalk.red("API key is required for chat functionality."));
+    }
+
+    process.exit(0);
+  });
+
+program
   .command("delete")
   .description("Delete your API key")
   .action(async () => {

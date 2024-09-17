@@ -72,7 +72,9 @@ export default async function intro() {
     "@exit"
   )} plugin.
 
-  ${chalk.greenBright("Start chatting or use a plugin to begin!")}
+  ${chalk.greenBright(
+    "Start chatting, or use a plugin to begin! Use shift+enter to finish your message, ctrl+c to exit."
+  )}
   `;
 
   console.log(usageText);

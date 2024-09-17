@@ -21,7 +21,7 @@ const determinePlugins = async (
     .join("\n");
 
   const llmPrompt = `
-  Given the following user input, conversation context, and available plugins, determine if any plugins should be used. If so, provide the plugin keyword (with @ handle). If no plugins are applicable, respond with "none".
+  Given the following user input, conversation context, and available plugins, determine if any plugins should be used. If so, provide the plugin keyword (with @ handle) only. If no plugins are applicable, respond with "none".
   
   Available plugins:
   ${pluginDescriptions}

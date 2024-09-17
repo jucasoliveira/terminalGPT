@@ -10,6 +10,7 @@ import { deleteCredentials } from "./creds";
 import readline from "readline";
 import { findPlugin, executePlugin, initializePlugins } from "./commands";
 import determinePlugins from "./rag";
+import multiline from "./multiline";
 
 const program = new Command();
 
@@ -26,64 +27,67 @@ program
     // Initialize plugins
     initializePlugins();
 
-    const prompt = () => {
+    const prompt = async () => {
       process.stdout.write(chalk.blueBright("\nYou: "));
       process.stdin.resume();
       process.stdin.setEncoding("utf-8");
-      process.stdin.once("data", async (data) => {
-        const userInput = data.toString().trim();
 
-        if (creds.apiKey != null) {
-          try {
-            // Direct plugin call
-            const plugin = findPlugin(userInput);
-            if (plugin) {
-              console.log(chalk.yellow(`Executing plugin: ${plugin.name}`));
-              await executePlugin(plugin, {
-                userInput,
-                engine: creds.engine,
-                apiKey: creds.apiKey,
-                opts: { ...opts, model: creds.model || undefined },
-              });
-            } else {
-              // Use LLM to determine if a plugin should be used
-              const pluginKeyword = await determinePlugins(
-                creds.engine,
-                creds.apiKey,
-                userInput,
-                { ...opts, model: creds.model || undefined }
-              );
+      const data = await multiline();
 
-              if (pluginKeyword !== "none") {
-                const plugin = findPlugin(pluginKeyword);
-                if (plugin) {
-                  console.log(chalk.yellow(`Executing plugin: ${plugin.name}`));
-                  await executePlugin(plugin, {
-                    userInput,
-                    engine: creds.engine,
-                    apiKey: creds.apiKey,
-                    opts: { ...opts, model: creds.model || undefined },
-                  });
-                } else {
-                  console.log(chalk.red(`Plugin not found: ${pluginKeyword}`));
-                }
-              } else {
-                // No plugin applicable, use regular promptResponse
-                await promptResponse(creds.engine, creds.apiKey, userInput, {
-                  ...opts,
-                  model: creds.model || undefined,
+      // process.stdin.once("data", async (data) => {
+      const userInput = data.toString().trim();
+
+      if (creds.apiKey != null) {
+        try {
+          // Direct plugin call
+          const plugin = findPlugin(userInput);
+          if (plugin) {
+            console.log(chalk.yellow(`Executing plugin: ${plugin.name}`));
+            await executePlugin(plugin, {
+              userInput,
+              engine: creds.engine,
+              apiKey: creds.apiKey,
+              opts: { ...opts, model: creds.model || undefined },
+            });
+          } else {
+            // Use LLM to determine if a plugin should be used
+            const pluginKeyword = await determinePlugins(
+              creds.engine,
+              creds.apiKey,
+              userInput,
+              { ...opts, model: creds.model || undefined }
+            );
+
+            if (pluginKeyword.trim() !== "none") {
+              const plugin = findPlugin(pluginKeyword);
+              if (plugin) {
+                console.log(chalk.yellow(`Executing plugin: ${plugin.name}`));
+                await executePlugin(plugin, {
+                  userInput,
+                  engine: creds.engine,
+                  apiKey: creds.apiKey,
+                  opts: { ...opts, model: creds.model || undefined },
                 });
+              } else {
+                console.log(chalk.red(`Plugin not found: ${pluginKeyword}`));
               }
+            } else {
+              // No plugin applicable, use regular promptResponse
+              await promptResponse(creds.engine, creds.apiKey, userInput, {
+                ...opts,
+                model: creds.model || undefined,
+              });
             }
-          } catch (error) {
-            console.error(chalk.red("An error occurred:"), error);
           }
-        } else {
-          console.log(chalk.red("API key is required for chat functionality."));
+        } catch (error) {
+          console.error(chalk.red("An error occurred:"), error);
         }
+      } else {
+        console.log(chalk.red("API key is required for chat functionality."));
+      }
 
-        prompt();
-      });
+      prompt();
+      //  });
     };
 
     prompt();

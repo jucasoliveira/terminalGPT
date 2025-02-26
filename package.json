@@ -1,14 +1,15 @@
 {
   "name": "terminalgpt",
-  "version": "2.0.1",
-  "main": "lib/index.js",
+  "version": "2.0.3",
+  "main": "lib/src/index.js",
   "description": "Get GPT like chatGPT on your terminal",
   "scripts": {
-    "tgpt": "node lib/index.js",
+    "tgpt": "node lib/src/index.js",
     "test": "jest --ci --coverage --verbose",
     "dev": "ts-node src/index.ts chat  --temperature 0.7",
     "dev:delete": "ts-node src/index.ts delete",
-    "postinstall": "tsc"
+    "build": "tsc && chmod +x lib/src/index.js",
+    "postinstall": "npm run build"
   },
   "homepage": "https://github.com/jucasoliveira/terminalGPT#readme",
   "repository": {
@@ -22,7 +23,7 @@
     "url": "https://github.com/jucasoliveira/terminalGPT/issues"
   },
   "bin": {
-    "tgpt": "lib/index.js"
+    "tgpt": "lib/src/index.js"
   },
   "jest": {
     "transform": {

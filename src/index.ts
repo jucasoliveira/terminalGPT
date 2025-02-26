@@ -11,6 +11,7 @@ import readline from "readline";
 import { findPlugin, executePlugin, initializePlugins } from "./commands";
 import determinePlugins from "./rag";
 import multiline from "./multiline";
+import { clearContext } from "./context";
 
 const program = new Command();
 
@@ -57,7 +58,7 @@ program
               userInput,
               { ...opts, model: creds.model || undefined }
             );
-
+            clearContext();
             if (pluginKeyword.trim() !== "none") {
               const plugin = findPlugin(pluginKeyword);
               if (plugin) {
@@ -72,7 +73,6 @@ program
                 console.log(chalk.red(`Plugin not found: ${pluginKeyword}`));
               }
             } else {
-              // No plugin applicable, use regular promptResponse
               await promptResponse(creds.engine, creds.apiKey, userInput, {
                 ...opts,
                 model: creds.model || undefined,
@@ -112,7 +112,7 @@ program
           { ...opts, model: creds.model || undefined }
         );
 
-        if (pluginKeyword !== "none") {
+        if (pluginKeyword.trim() !== "none") {
           const plugin = findPlugin(pluginKeyword);
           if (plugin) {
             console.log(chalk.yellow(`Executing plugin: ${plugin.name}`));

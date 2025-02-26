@@ -158,7 +158,8 @@ export const promptResponse = async (
     const markedText = marked.parse(text);
     for (let i = 0; i < markedText.length; i++) {
       process.stdout.write(markedText[i]);
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      // increase the speed of the output
+      await new Promise((resolve) => setTimeout(resolve, 5));
     }
   } catch (err) {
     console.error(`${chalk.red("Something went wrong!!")} ${err}`);

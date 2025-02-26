@@ -48,10 +48,11 @@ const determinePlugins = async (
   const result = matchedPlugin ? matchedPlugin.keyword : "none";
 
   // Add AI response to context
-  addContext({
-    role: "assistant",
-    content: result,
-  });
+  result !== "none" &&
+    addContext({
+      role: "assistant",
+      content: result,
+    });
 
   return result;
 };
